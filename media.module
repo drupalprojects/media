@@ -13,10 +13,10 @@
  * 
  */
 function media_menu() {
-  // ajax formater 
+  // ajax formatter 
   $items['media/ajax'] = array(
     'title' => 'media Ajax',
-    'page callback' => 'media_ajax_formater_load',
+    'page callback' => 'media_ajax_formatter_load',
     'access arguments' => array('access content'),
     'file' => 'media_ajax.inc',
   );
@@ -37,9 +37,9 @@ function media_form_alter (&$form, $form_state, $form_id) {
   // $check_js is wether or not the client has JS
   
 
-  // get the formaters for specified type 
+  // get the formatters for specified type 
   
-  //print_r(media_registration_item_formaters(null, media_registration_kinds('formater')));
+  //print_r(media_registration_item_formatters(null, media_registration_kinds('formatter')));
   
   $form['test'] = media_get_user_file_options('', '', $user->uid);
  
@@ -136,11 +136,17 @@ function media_get_user_file_options($node_type, $field, $uid) {
   // now we order modules into tabs structure
   // @TODO implement admin weighting here some how
   foreach ($items as $tab_name => $item) {
-    // now create the sub element (drawer)
+    $drawers = array();
+    $first = true;
+    // now create the sub element (drawer)    
     foreach($item as $drawer_name => $data ) {
+      // strip out any scary stuff so we can make an id
+      $drawer_id = str_replace(array(' ', "'", '"', "%", "<", ">"), '', $drawer_name);
       // create all the drawers
-      $drawers[] = '<div class="media browser drawer">'. $drawer_name .'</div>';
+      $drawers[] =  '<a onclick="javascript: false;" href="#'. $drawer_id .'">'. $drawer_name .'</a>';
+      
       // add a add buton on each item
+      // @TODO this needs AHAH support
       $item[$drawer_name]['form']['add'] = array(
         '#type' => 'button',
         '#value' => t('Add')
@@ -148,12 +154,16 @@ function media_get_user_file_options($node_type, $field, $uid) {
       $my_files_elements[$tab_name][$drawer_name] = array(
         '#type' => 'markup',
         '#value' => '',
-        '#prefix' => '<div class="media browser drawer">'. $drawer_name .'</div><div class="media browser display">',
+        '#prefix' => '<div class="media browser display '. ($first ? 'first': '') .'" id="'. $drawer_id .'"><a name="'. $drawer_id .'"/>',
         '#suffix' => '</div>',
         'content' => $item[$drawer_name]['form'],
       );
+      $first = false;
     }
-  }      
+    // now add the drawers onto the tab and make it render first
+    $my_files_elements[$tab_name]['drawers']['#value'] = '<div class="drawers">'. theme('item_list', $drawers) .'</div>';
+    $my_files_elements[$tab_name]['drawers']['#weight'] = -9;
+  }
   return media_tabs_form($my_files_elements);  
 }
 
@@ -270,7 +280,7 @@ function _media_admin_form_perm_append($form, $append, $permissions) {
 
 /**
  * Parsing function for the registrations to hand back the kinds 
- * of modules registering. Used to select all formaters, containers, etc
+ * of modules registering. Used to select all formatters, containers, etc
  * @param string $kinds
  *   return all the matching registrations of this kind
  * @return array
@@ -296,31 +306,31 @@ function media_registration_kinds($kind = null) {
 
 
 /**
- * Returns a set of formaters which can format the specified 
- * item. If $description is null, all formaters will be returned. If 
+ * Returns a set of formatters which can format the specified 
+ * item. If $description is null, all formatters will be returned. If 
  * a set of registered modules can be passed in to narrow the
- * formater options. 
+ * formatter options. 
  * @param string $description
  *   file extension to return
  * @param unknown_type $registrations
  * @return array
  */
-function media_registration_item_formaters($description = '*', $registrations = null) {
-  $formaters = array();
+function media_registration_item_formatters($description = '*', $registrations = null) {
+  $formatters = array();
   // get all the registrations if we don't have any
   if (! $registrations) {
     $registrations = media_get_registered_modules();
   }
-  // itterate through each of the registered modules and find the formaters
+  // itterate through each of the registered modules and find the formatters
   foreach ($registrations as  $id => $registration) {
-    // look for the formater, or just take all
-    if ((is_array($registration['kind']['formater']['types']) && in_array($registration['kind']['formater']['types'], $description))
+    // look for the formatter, or just take all
+    if ((is_array($registration['kind']['formatter']['types']) && in_array($registration['kind']['formatter']['types'], $description))
       || $description == '*' 
-      || $registration['kind']['formater']['types'] == '*') {
-      $formaters[$registration['module']] = $id;
+      || $registration['kind']['formatter']['types'] == '*') {
+      $formatters[$registration['module']] = $id;
     }
   }
-  return $formaters;
+  return $formatters;
 }
 
 
@@ -408,7 +418,7 @@ function media_tabs_form($forms) {
     $form = array();  
     $form['media_tabs'] = array(
       '#type' => 'tabset',
-      '#attributes' => array('class' => 'media browser'),
+      '#attributes' => array('class' => 'media browser clearfix'),
     );
     foreach ($forms as $id => $element) {
       $form['media_tabs']['tab_'. $id] = array(
@@ -452,7 +462,7 @@ function media_media_user_files_select($node_type, $field, $uid) {
         'form' => media_display_user_files_form($files, t('Your files')),
       ),
       t('FTP') => array( 
-        'form' => array('#value' => 'this would be the FTP files'),
+        'form' => array('#value' => 'this would be the FTP files<br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />'),
       ),
       t('Yahoo') => array( 
         'form' => array('#value' => 'this would be the yahoo files'),

@@ -18,30 +18,65 @@
 
 /* move the tabs to the right */
 .media.browser ul.primary {
-	margin-left: 160px;
+	margin-left: 118px;
 }
 
-/* style the right hand drawers */
-.media.browser.drawer{
-  border: 1px solid #000000;
-	margin: 5px 10px 3px 0;
-	padding: 5px 10px;
-	width: 130px;
+/* style the left hand drawers */
+.media.browser .ui-tabs-panel .item-list ul li{
+	background-color: #999999;
+	background-image: none;
+	border: 1px solid #000000;
+	clear: left;
+	float: left;
 	height: 20px;
-  text-align: left;
-  clear: left;
-  float: left;
-  background-color: #999999;
-  color: #ffffff;
+	list-style: none;
+	margin: 5px 10px 3px 10;
+	padding: 5px 10px 5px 10px;
+	width: 90px;
 }
+
+.media.browser .ui-tabs-panel .item-list ul li a {
+	color: #ffffff;
+}
+
 
 /* style the active drawer */
-.media.browser.drawer.active{
-	background-color: #cccccc;
-	color: #000000;
+.media.browser .ui-tabs-panel .item-list ul li.active{
+	background-color: #dddddd;
 }
+
+.media.browser .ui-tabs-panel .item-list ul li.active a {
+  color: #000000;
+}
+
 
 /* style the display of the drawer */
 .media.browser.display {
-  margin-left: 160px;
+  margin-left: 118px;
 } 
+
+
+/* -------------------------------------------- */
+/* clear fix fix */
+
+.clearfix:after {
+    content: ".";
+    display: block;
+    clear: both;
+    visibility: hidden;
+    line-height: 0;
+    height: 0;
+}
+
+.clearfix {
+    display: inline-block;
+}
+
+html[xmlns] .clearfix {
+    display: block;
+}
+
+* html .clearfix {
+    height: 1%;
+}
+

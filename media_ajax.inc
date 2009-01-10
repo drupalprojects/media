@@ -14,9 +14,12 @@
  * @param string $file_extension
  *   the kind of file that will be operated on
  */
-function media_ajax_formater_load($node_type, $field, $uri = 'file://', $file_extension) {
+function media_ajax_formatter_load($node_type, $field, $uri = 'file://', $file_extension) {
   // we need to check the adminstrative settings for this 
-  // node tyi
+  
+  // @TODO allow uri based handling
+  
+  // get all the registered modules that can handle this file type 
   
 
 }
