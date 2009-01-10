@@ -138,10 +138,13 @@ function media_get_user_file_options($node_type, $field, $uid) {
   foreach ($items as $tab_name => $item) {
     // now create the sub element (drawer)
     foreach($item as $drawer_name => $data ) {
+      // create all the drawers
+      $drawers[] = '<div class="media browser drawer">'. $drawer_name .'</div>';
       $my_files_elements[$tab_name][$drawer_name] = array(
         '#type' => 'markup',
-        '#value' => '<div class="media drawer">'. $drawer_name .'</div>',
-        '#attributes' => array('class' => 'media drawer'),
+        '#value' => '',
+        '#prefix' => '<div class="media browser drawer">'. $drawer_name .'</div><div class="media browser display">',
+        '#suffix' => '</div>',
         'content' => $item[$drawer_name]['form'],
       );
     }
@@ -392,6 +395,8 @@ function media_tabs_form($forms) {
   if (module_exists('tabs')) {
     // load our css
     drupal_add_css(drupal_get_path('module', 'media') .'/media.css');
+    // load our js
+    drupal_add_js(drupal_get_path('module', 'media') .'/media.js');
     
     $form = array();  
     $form['media_tabs'] = array(

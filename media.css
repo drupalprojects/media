@@ -11,20 +11,37 @@
   padding: 5px;
 }
 
+/* add a border to the tabs */
 .media.browser .tabs.primary {
-  border-bottom: 2px solid #999999;
-  padding-bottom: 5px;
-  width: 50%;
+  padding-bottom: 2px;
 }
 
-.media.drawer{
-  float: left;
+/* move the tabs to the right */
+.media.browser ul.primary {
+	margin-left: 160px;
+}
+
+/* style the right hand drawers */
+.media.browser.drawer{
   border: 1px solid #000000;
-  padding: 5px 80px 5px 10px;
-  margin-right: 10px;
+	margin: 5px 10px 3px 0;
+	padding: 5px 10px;
+	width: 130px;
+	height: 20px;
   text-align: left;
+  clear: left;
+  float: left;
   background-color: #999999;
   color: #ffffff;
 }
- 
- 
+
+/* style the active drawer */
+.media.browser.drawer.active{
+	background-color: #cccccc;
+	color: #000000;
+}
+
+/* style the display of the drawer */
+.media.browser.display {
+  margin-left: 160px;
+} 
