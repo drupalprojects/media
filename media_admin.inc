@@ -47,11 +47,11 @@ function media_admin_settings($form, $type_name = null) {
   }
   
   // master  settings
-  $form['media_'. $type .'_enabled'] = array(
+  $form['media_'. $type_name .'_enabled'] = array(
     '#title' => t('Media file browser is enabled'),
     '#type' => 'checkbox',
     '#descripton' => t('Enable the Media file browser for this node type.'),
-    '#default_value' => variable_get('media_'. $type .'_enabled', null),
+    '#default_value' => variable_get('media_'. $type_name .'_enabled', null),
   );
   
   // define the kinds of options are available per field

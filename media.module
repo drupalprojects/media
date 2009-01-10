@@ -20,6 +20,17 @@ function media_menu() {
     'access arguments' => array('access content'),
     'file' => 'media_ajax.inc',
   );
+  
+  // media configuration per content type
+  $items['admin/content/media'] = array(
+    'title' => 'Media',
+    'description' => 'Configure your site\'s Media settings.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('media_admin_settings'),
+    'access arguments' => array('administer media'),
+    'file' => 'media_admin.inc',
+  );
+  
   return $items;
 }
 
@@ -34,37 +45,15 @@ function media_menu() {
 function media_form_alter (&$form, $form_state, $form_id) {
   global $user;
   
-  // $check_js is wether or not the client has JS
-  
-
-  // get the formatters for specified type 
-  
-  //print_r(media_registration_item_formatters(null, media_registration_kinds('formatter')));
-  
-  $form['test'] = media_get_user_file_options('', '', $user->uid);
- 
-  $form['test']['#weight'] = -9;
-  
-  // we only handle media stuff on the node add/edit form
+  // add the media browser on the node add/edit screen
   if (strstr($form_id, 'node_form') ) {
-    
-    // need to control display here
-  
-    
-    // collect all the form elements we need to hide
-
-    // fire hook
-    
-    // put these elements into JS
-    //drupal_add_js($elements, 'inline');
-    
-    // load the media JS file
-    //drupal_add_js(drupal_get_path('module', 'media') .'/media.js');
-    
-    // do we need to add a field to store data in?
-    
+    // is the media browser enabled on this node type?
+    if (variable_get('media_'. $form['type']['#value'] .'_enabled', null)) {    
+      // display the media browser form
+      $form['test'] = media_get_user_file_options('', '', $user->uid);   
+      $form['test']['#weight'] = -9;
+    }    
   }
-  
 }
 
 
@@ -165,6 +154,24 @@ function media_get_user_file_options($node_type, $field, $uid) {
     $my_files_elements[$tab_name]['drawers']['#weight'] = -9;
   }
   return media_tabs_form($my_files_elements);  
+}
+
+
+/**
+ * Generic hook call for media
+ *
+ * @param string $hook
+ *   hook name
+ * @return array
+ */
+function media_extend($hook) {
+  $data = array();
+  // get a list of the modules that implement this hook
+  foreach (module_implements($hook) as $module) {
+    // add the data keyed by module name
+    $data[$module] = module_invoke($module, $hook);
+  }
+  if (count($data)) {return $data; }
 }
 
 
@@ -273,9 +280,56 @@ function _media_admin_form_perm_append($form, $append, $permissions) {
   return $form;
 }
 
+/* ***************************************** */
+/* Media API Functions                       */
+/* ***************************************** */
+
+
+/**
+ * Get all fields that can be enabled on
+ * a field type
+ * @param string $type
+ *   the field type to get items for
+ * @param string $function_type
+ *   the kind of functionality being looked for
+ * @return array
+ *   array of full registration objects
+ */
+function media_get_fields($field_type, $function_type = 'container') {
+  static $data;
+  
+  // do we have cached version?
+  if ($data[$field_type][$function_type]) {
+    return $data[$field_type][$function_type];
+  }
+  
+  $data = array();
+  // get all the registered modules  
+  foreach (media_get_registered_modules() as $id => $registration) {
+    // check to see if this registration supports this function type
+    if ($registration['kind'][$function_type]) {
+      // now look for the fields
+      if ($registration['fields']) {
+        foreach ($registration['fields'] as $field) {       
+          // if this registration supports this field type, add it to the return
+          if ($field == $field_type) {
+            $data[$field_type][$function_type][$id] = $registration;
+          }
+        }
+      }
+    }
+  }
+
+  return $data[$field_type][$function_type];
+}
+
+function media_get_formaters() {
+  
+  
+}
 
 /* ***************************************** */
-/* media Internal Functions                  */
+/* Media Internal Functions                  */
 /* ***************************************** */
 
 /**
@@ -364,9 +418,17 @@ function media_registration_data($name) {
   // get the registered modules
   $registrations = media_get_registered_modules();
   // parse the registrations
-  foreach ($registrations as $registration) {
-    // get the item that was requested
-    $data = array_merge($data, $registration[$name]);
+  foreach ($registrations as $id => $registration) {
+    // Do we have this data in this registration
+    if ($registration[$name]) { 
+      // get the item that was requested
+      $data[$registration['module']] = array(
+        $id => array(
+          $name => $registration[$name], 
+          'description' => $registration['description']
+        )
+      );
+    }
   }
   return $data;
 }
