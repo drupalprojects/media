@@ -23,12 +23,15 @@
   
   
 	// now we need to bind click functionality on drawers to display
-	$('.media.browser .ui-tabs-panel .drawers .item-list ul li').bind('click', function () {
+	$('.media.browser .ui-tabs-panel .drawers .item-list ul li, .drawers li a').bind('click', function () {
 	  // get the href id that we want to display 
-	  var display_id = $(this).children('a').attr('href');
+	  // is this an a element? 
+	  var display_id = $(this).attr('href');
+	  if (display_id == undefined) {
+	    var display_id = $(this).children('a').attr('href');
+	  }
 	  // we need to get the container that this drawer is in
-	  var parent = $(this).parents('.ui-tabs-panel').attr('id');
-	  
+	  var parent = $(this).parents('.ui-tabs-panel').attr('id');	  
 	  // hide current active display
 	  $('#'+parent+' .display.active').removeClass('active').hide();
 	  // set any drawers to not active
