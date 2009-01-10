@@ -1,0 +1,24 @@
+/* $Id */
+
+/**
+ * @file
+ * This provides the basic styling for the media browser elements
+ */
+ 
+ 
+.media.browser {
+  border: 1px solid #999999;
+  padding: 5px;
+}
+
+.media.drawer{
+  float: left;
+  border: 1px solid #000000;
+  padding: 5px 80px 5px 10px;
+  margin-right: 10px;
+  text-align: left;
+  background-color: #999999;
+  color: #ffffff;
+}
+ 
+ 

@@ -16,7 +16,7 @@
   *   array
   */
 function media_upload_media_register() {
-  return array(
+  $registration = array(
     'media_upload_container' => array(
       // human readable name
       'name' => t('Media Upload container'),
@@ -33,7 +33,7 @@ function media_upload_media_register() {
       'description' => t('Provides integration with Drupal\'s Upload module'),
       // fields
       'fields' => array('attachments'),
-     ),
+    ),
      
     // display the file
     'media_upload_display' => array(
@@ -52,6 +52,25 @@ function media_upload_media_register() {
       'description' => t('Provides integration with Drupal\'s Upload module'),
       // fields
       'fields' => array(),
-     ),
+     
+    );
+  return $registration;
+}
+
+
+/**
+ * Implementation of hook_media_user_files_select
+ *
+ * @param string $node_type
+ * @param string $field
+ * @param int $uid
+ */
+function media_upload_media_user_files_select($node_type, $field, $uid) {
+  return array(
+   t('Add files') => array(
+       t('New file') => array(
+         'form' => media_display_upload_form(),
+       )
+    )
   );
 }

@@ -80,6 +80,10 @@ function media_theme() {
         'tabs' => NULL,
       ),
     ),
+    'media_file_browser' => array(
+      'file' => 'media_theme.inc',
+      'arguments' => array('element' => null),
+    )
   );
 }
 
@@ -87,7 +91,6 @@ function media_theme() {
 /* ***************************************** */
 /* media hook calls                          */
 /* ***************************************** */
-
 
 /**
  * Gets all of the modules which register with ReMiG
@@ -140,8 +143,7 @@ function media_get_user_file_options($node_type, $field, $uid) {
       '#attributes' => array('class' => 'media drawer'),
       'content' => $item[$name]['form'],
     );
-  }    
-  
+  }      
   return media_tabs_form($my_files_elements);  
 }
 
@@ -367,7 +369,7 @@ function media_form () {
 }
 
 /* *************************************************** */
-/* media forms                                         */
+/* Media forms                                         */
 /* *************************************************** */
 
 /**
@@ -420,12 +422,16 @@ function media_display_upload_form() {
  */
 function media_tabs_form($forms) {
   if (module_exists('tabs')) {
-    $form = array();    
-    $form['remig'] = array(
+    // load our css
+    drupal_add_css(drupal_get_path('module', 'media') .'/media.css');
+    
+    $form = array();  
+    $form['media_tabs'] = array(
       '#type' => 'tabset',
+      '#attributes' => array('class' => 'media browser'),
     );
     foreach ($forms as $id => $element) {
-      $form['remig']['tab_'. $id] = array(
+      $form['media_tabs']['tab_'. $id] = array(
         '#type' => 'tabpage',
         '#title' => $id,
         'content' => $element,
@@ -439,7 +445,7 @@ function media_tabs_form($forms) {
 }
 
 /* ***************************************** */
-/* media Hook Implementations                */
+/* Media Hook Implementations                */
 /* ***************************************** */
 
 /**
@@ -464,12 +470,7 @@ function media_media_user_files_select($node_type, $field, $uid) {
       t('Local') => array( 
         'form' => media_display_user_files_form($files, t('Your files')),
       )
-    ),
-    t('Add files') => array(
-     t('New file') => array(
-       'form' => media_display_upload_form(),
-     )
-    ),    
+    )   
   );
   return $return;
 }
