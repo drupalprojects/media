@@ -117,7 +117,7 @@ function media_get_registered_modules() {
 
 /**
  * Get all module data that uses the "media_user_files_select" hook
- *
+ * @TODO clean this form up and use a form theme function
  * @param string $node_type
  * @param string $field
  * @param uid $uid
@@ -140,6 +140,11 @@ function media_get_user_file_options($node_type, $field, $uid) {
     foreach($item as $drawer_name => $data ) {
       // create all the drawers
       $drawers[] = '<div class="media browser drawer">'. $drawer_name .'</div>';
+      // add a add buton on each item
+      $item[$drawer_name]['form']['add'] = array(
+        '#type' => 'button',
+        '#value' => t('Add')
+      );
       $my_files_elements[$tab_name][$drawer_name] = array(
         '#type' => 'markup',
         '#value' => '',
@@ -388,7 +393,9 @@ function media_display_user_files_form($files, $title = null) {
 
 /**
  * wrapper to build the media tabs
+ * @TODO make this a cleaner form function that uses a theme function
  * @param array $forms
+ *   array of forms to be tabbed
  * @return array
  */
 function media_tabs_form($forms) {
@@ -408,6 +415,7 @@ function media_tabs_form($forms) {
         '#type' => 'tabpage',
         '#title' => $id,
         'content' => $element,
+        '#suffix' => '<br class="clear" />',
       );
     }
   }
@@ -444,7 +452,10 @@ function media_media_user_files_select($node_type, $field, $uid) {
         'form' => media_display_user_files_form($files, t('Your files')),
       ),
       t('FTP') => array( 
-        'form' => media_display_user_files_form($files, t('Faux FTP')),
+        'form' => array('#value' => 'this would be the FTP files'),
+      ),
+      t('Yahoo') => array( 
+        'form' => array('#value' => 'this would be the yahoo files'),
       )
     )
   );
