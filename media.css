@@ -21,16 +21,19 @@
 	margin-left: 118px;
 }
 
+/* style the drawers container */
+
+
 /* style the left hand drawers */
 .media.browser .ui-tabs-panel .item-list ul li{
 	background-color: #999999;
 	background-image: none;
-	border: 1px solid #000000;
+	border: 1px solid #999999;
 	clear: left;
 	float: left;
 	height: 20px;
 	list-style: none;
-	margin: 5px 10px 3px 10;
+	margin: 5px 0px 3px 10;
 	padding: 5px 10px 5px 10px;
 	width: 90px;
 }
@@ -39,10 +42,17 @@
 	color: #ffffff;
 }
 
+/* push the drawers down */
+.media.browser .ui-tabs-panel .item-list ul li.first{
+	margin-top: 10px;
+}
+
 
 /* style the active drawer */
 .media.browser .ui-tabs-panel .item-list ul li.active{
-	background-color: #dddddd;
+	background-color: #ffffff;
+	border-right: none;
+	width: 91px;
 }
 
 .media.browser .ui-tabs-panel .item-list ul li.active a {
@@ -52,7 +62,7 @@
 
 /* style the display of the drawer */
 .media.browser.display {
-  margin-left: 118px;
+  margin-left: 111px;
 } 
 
 

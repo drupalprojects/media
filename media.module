@@ -462,7 +462,7 @@ function media_media_user_files_select($node_type, $field, $uid) {
         'form' => media_display_user_files_form($files, t('Your files')),
       ),
       t('FTP') => array( 
-        'form' => array('#value' => 'this would be the FTP files<br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />'),
+        'form' => array('#value' => 'this would be the FTP files<br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />'),
       ),
       t('Yahoo') => array( 
         'form' => array('#value' => 'this would be the yahoo files'),
