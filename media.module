@@ -132,17 +132,19 @@ function media_get_user_file_options($node_type, $field, $uid) {
     $function = $module .'_media_user_files_select';
     $items = array_merge($items, $function($node_type, $field, $uid));
   }
+
   // now we order modules into tabs structure
   // @TODO implement admin weighting here some how
-  foreach ($items as $id => $item) {
-    $name = key($item);
+  foreach ($items as $tab_name => $item) {
     // now create the sub element (drawer)
-    $my_files_elements[$id][$name] = array(
-      '#type' => 'markup',
-      '#value' => '<div class="media drawer">'. $name .'</div>',
-      '#attributes' => array('class' => 'media drawer'),
-      'content' => $item[$name]['form'],
-    );
+    foreach($item as $drawer_name => $data ) {
+      $my_files_elements[$tab_name][$drawer_name] = array(
+        '#type' => 'markup',
+        '#value' => '<div class="media drawer">'. $drawer_name .'</div>',
+        '#attributes' => array('class' => 'media drawer'),
+        'content' => $item[$drawer_name]['form'],
+      );
+    }
   }      
   return media_tabs_form($my_files_elements);  
 }
@@ -352,22 +354,6 @@ function media_registration_data($name) {
 }
 
 
-/**
- * Build the file browser / uploader 
- */
-function media_form () {
-  global $user;
-  $files = media_get_user_files($user->uid);
-  $form['media'] = array(
-    '#type' => 'tabset',
-    array(
-      media_display_user_files_form($files),
-      media_display_upload_form(),
-    ),    
-  );
-  return $form;
-}
-
 /* *************************************************** */
 /* Media forms                                         */
 /* *************************************************** */
@@ -394,24 +380,6 @@ function media_display_user_files_form($files, $title = null) {
     '#size' => 10,
   );
   return $form;
-}
-
-
-/**
- * Display the upload form for the tab 
- * @return string
- */ 
-function media_display_upload_form() {
-  $form['media_formaters'] = array(
-    '#title' => 'formaters placeholder',
-    '#value' => '<br />fomaters will be loaded in here via ajax',
-  );
-  $form['media_upload']['upload'] = array(
-    '#type' => 'file',
-    '#title' => t('Upload your file'),
-    '#size' => 30,
-   );
-   return $form;
 }
 
 
@@ -469,8 +437,11 @@ function media_media_user_files_select($node_type, $field, $uid) {
     t('My files') => array(
       t('Local') => array( 
         'form' => media_display_user_files_form($files, t('Your files')),
+      ),
+      t('FTP') => array( 
+        'form' => media_display_user_files_form($files, t('Faux FTP')),
       )
-    )   
+    )
   );
   return $return;
 }
