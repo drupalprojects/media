@@ -36,11 +36,12 @@ function media_upload_media_register() {
     
     'media_upload_display' => array(
       // human readable name
-      'name' => t('Media Drupal Upload display'),
+      'name' => t('Media Drupal Upload display FORMATTER'),
       'uri' => 'file',
       // kind of item, one of     
       // container, format, insert, post_format
       'kind' => 'formatter',
+      'callback' => 'media_upload_formatter_form',     
       'types' => '*',
       'description' => t('Format Drupal uploaded files'),       
       // human readable description
@@ -65,14 +66,26 @@ function media_upload_media_register() {
   return $registration;
 }
 
+function media_upload_formatter_form($node_type, $field, $uri, $file_extension) {
+  $form['test_stuff'] = array(
+    '#type' => 'select',
+    '#options' => array(1 => 1  ,2 =>2  ,3 => 3 ,4 => 4),
+    '#title' => 'formater ahah',
+  );
+  
+  return $form;
+}
 
 
 /**
  * Implementation of hook_media_user_files_select
  *
  * @param string $node_type
+ *   drupal node type
  * @param string $field
+ *   field name that is being overridden
  * @param int $uid
+ *   user id
  */
 function media_upload_media_user_files_select($node_type, $field, $uid) {
   return array(

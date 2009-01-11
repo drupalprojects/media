@@ -62,15 +62,15 @@ function media_admin_settings($form, $type_name = null) {
 
     // build a form for each type of module that we have  
     foreach (media_registration_kinds() as $kind) {
-      // get all the containers that match this field      
+      // get all the containers that match this field
       if ($registrations = media_get_fields($field['type'], $kind)) {
         $options = array();
         foreach ($registrations as $id => $registration) {
           $options[$field['field_name'] .'--'. $id] = $registration['name'] .': '. $registration['description'];
         }
         $form[$field['field_name']]['media_'. $type_name .'_'. $kind] = array(
-          '#title' => t('Enable file options for this field'),
-          '#description' => t('Choose which file options you would like to have enabled on this field'),
+          '#title' => t('Enable !kind options for this field', array('!kind' => $kind)),
+          '#description' => t('Choose which !kind options you would like to have enabled on this field', array('!kind' => $kind)),
           '#type' => 'checkboxes',
           '#options' => $options,
           '#default_value' => variable_get('media_'. $type_name .'_'. $kind, array()),

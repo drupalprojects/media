@@ -14,11 +14,10 @@
  */
 function media_menu() {
   // ajax formatter 
-  $items['media/ajax'] = array(
-    'title' => 'media Ajax',
-    'page callback' => 'media_ajax_formatter_load',
+  $items['media/ahah'] = array(
+    'page callback' => 'media_ahah_formatter_load',
     'access arguments' => array('access content'),
-    'file' => 'media_ajax.inc',
+    'file' => 'media_ahah.inc',
   );
   
   // media configuration per content type
@@ -151,9 +150,16 @@ function media_build_browser($containers, $node_type, $field, $uid) {
       
       // add a add buton on each item
       // @TODO this needs AHAH support
-      $item[$drawer_name]['form']['add'] = array(
+      $form[$drawer_id]['form']['add'] = array(
         '#type' => 'button',
-        '#value' => t('Add')
+        '#value' => t('Add'),
+        '#ahah' => array(
+          'event' => 'click',
+          'path' => 'media/ahah/'. $node_type .'/'. $field,
+          'wrapper' => $drawer_id .'_add',
+          'method' => 'replace',        
+        ),
+        '#suffix' => '<div id="'. $drawer_id .'_add"></div>',
       );
       $my_files_elements[$tab_name][$drawer_id] = array(
         '#type' => 'markup',
@@ -325,7 +331,7 @@ function media_get_fields($field_type, $function_type = 'container') {
   // get all the registered modules  
   foreach (media_get_registered_modules() as $id => $registration) {
     // check to see if this registration supports this function type
-    if ($registration['kind'][$function_type]) {
+    if ($registration['kind'] == $function_type) {
       // now look for the fields
       if ($registration['fields']) {
         foreach ($registration['fields'] as $field) {       
@@ -486,7 +492,9 @@ function media_get_containers($containers, $node_type, $field, $uid) {
  * Get a list of fields for the requested node type
  *
  * @param string $type
+ *   drupal node type
  * @param string $function
+ *   one of container, formatter
  * @return array
  *   array of field names
  */
