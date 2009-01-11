@@ -48,9 +48,9 @@ function media_admin_settings($form, $type_name = null) {
   
   // master  settings
   $form['media_'. $type_name .'_enabled'] = array(
-    '#title' => t('Media file browser is enabled'),
+    '#title' => t('Media resource browser'),
     '#type' => 'checkbox',
-    '#descripton' => t('Enable the Media file browser for this node type.'),
+    '#descripton' => t('Enable the Media resource browser for this node type.'),
     '#default_value' => variable_get('media_'. $type_name .'_enabled', null),
   );
   

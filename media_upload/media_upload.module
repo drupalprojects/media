@@ -17,15 +17,15 @@
   */
 function media_upload_media_register() {
   $registration = array(
-    'media_upload_stream' => array(
+    'media_upload_resource' => array(
       // human readable name
-      'name' => t('Media Upload stream'),
-      'kind' => 'stream', 
+      'name' => t('Media Upload resource'),
+      'kind' => 'resource', 
       'types' => '*',
       'description' => t('Drupal uploaded files'),
       // function to invoke when data is needed from this 
       'callbacks' => array(
-        'stream' => 'media_upload_media_user_files_select',
+        'resource' => 'media_upload_media_user_files_select',
       ),
       // human readable description
       'description' => t('Provides integration with Drupal\'s Upload module'),
@@ -50,11 +50,11 @@ function media_upload_media_register() {
       // human readable name
       'name' => t('Media Drupal Upload display'),
       'uri' => 'file',
-      'kind' => 'stream',
+      'kind' => 'resource',
       'types' => '*',
       'description' => t('Format Drupal uploaded files'),
       'callbacks' => array( 
-        'stream' => 'media_upload_media_user_files_select2',
+        'resource' => 'media_upload_media_user_files_select2',
        ),      
        // human readable description
       'description' => t('Provides integration with Drupal\'s Upload module'),
@@ -64,11 +64,11 @@ function media_upload_media_register() {
       // human readable name
       'name' => t('Media Mover files'),
       'uri' => 'file',
-      'kind' => 'stream',
+      'kind' => 'resource',
       'types' => '*',
       'description' => t('Integrate Media Mover files'),
       'callbacks' => array( 
-        'stream' => 'media_upload_media_mover_stream',
+        'resource' => 'media_upload_media_mover_resource',
        ),      
        // human readable description
       'description' => t('Provides integration with Media Mover'),
@@ -148,7 +148,7 @@ function media_upload_display_embed_form() {
    return $form;
 }
 
-function media_upload_media_mover_stream($node_type, $field, $uid) {
+function media_upload_media_mover_resource($node_type, $field, $uid) {
   $files = array();
   $results = db_query('SELECT complete_file FROM {media_mover_files} ');
   while ($file = db_fetch_array($results)) {
