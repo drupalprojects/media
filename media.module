@@ -4,6 +4,13 @@
 
 
 /* ***************************************** */
+/* DEFINITIONS                               */
+/* ***************************************** */
+
+define('MEDIA_STREAM_URI_DEFAULT', 'public://');
+define('MEDIA_TYPES_DEFAULT', '*');
+
+/* ***************************************** */
 /* DRUPAL API FUNCTIONS                      */
 /* ***************************************** */
 
@@ -92,7 +99,9 @@ function media_theme() {
  */
 function media_get_registered_modules($ids = null) {
   static $registrations;
-  if (! $registrations) {
+  // only build cache if ids are not being 
+  // passed in
+  if (! $registrations ) {
     $registrations = array();
     // get all the modules which implement 
     foreach (module_implements('media_register') as $module) {
@@ -102,17 +111,54 @@ function media_get_registered_modules($ids = null) {
       // add the module name to each registration
       foreach (array_keys($function()) as $key) {
         $registration[$key]['module'] = $module;
+        if (! $registraton[$key]['uri']) {
+          $registration[$key]['uri'] = MEDIA_STREAM_URI_DEFAULT;
+        }
+        if (! $registration[$key]['types']) {
+          $registration[$key]['types'] = MEDIA_TYPES_DEFAULT;
+        }
       }
       $registrations = array_merge($registrations, $registration); 
     }            
   }
+  // return requested registrations
   if ($ids) {
     foreach ($ids as $id) {
       $return[$id] = $registrations[$id];
     }
-    $registrations = $return;
+    return $return;
   }
   return $registrations;  
+}
+
+
+/**
+ * Select registrations for use by matching against uri and file extension
+ *
+ * @param array $registrations
+ *   array of extensions
+ * @param string $uri
+ *   the kind of uri being used
+ * @param string $file_extension
+ *   the current file extension
+ * @return array
+ *   of applicable formatters
+ */
+function media_get_applicable_formatters($registrations, $file_extension) {
+  // do we have a file extension? 
+  if ($file_extension) {
+    foreach ($registrations as $id => $formatter) {
+      // does this formatter use any file type?
+      if (! $registration['types'] == MEDIA_TYPES_DEFAULT ) {
+        // we need to look and see if this file type is supported specifically
+        if (! in_array($file_extension, $registration['types'])) {
+          // this registration is not useful
+          unset($registrations[$id]);          
+        }         
+      }
+    }
+  }
+  return $registrations;
 }
 
 
@@ -138,7 +184,7 @@ function media_build_browser($streams, $node_type, $field, $uid) {
   // @TODO implement admin weighting here somehow
   // @TODO clean this crap up! 
   // split the tabs into sets of drawers
-  foreach ($streams as $tab_name => $drawer_items) {
+  foreach ($streams as $tab_name => $drawer_items) {   
     $first = true;
     $drawers = array();
     // now create the sub element (drawer)
@@ -155,12 +201,14 @@ function media_build_browser($streams, $node_type, $field, $uid) {
         '#value' => t('Add'),
         '#ahah' => array(
           'event' => 'click',
-          'path' => 'media/ahah/'. $node_type .'/'. $field,
+          'path' => 'media/ahah/'. $form['stream_id'] .'/'. $node_type .'/'. $field,
           'wrapper' => $drawer_id .'_add',
           'method' => 'replace',        
         ),
         '#suffix' => '<div id="'. $drawer_id .'_add"></div>',
       );
+      // remove the stream id
+      unset($form['stream_id']);
       $my_files_elements[$tab_name][$drawer_id] = array(
         '#type' => 'markup',
         '#value' => '',
@@ -175,7 +223,6 @@ function media_build_browser($streams, $node_type, $field, $uid) {
     $my_files_elements[$tab_name]['drawers']['#weight'] = -9;
   }
 
-  //print_r(media_tabs_form($my_files_elements));
   return media_tabs_form($my_files_elements);
   
 }
@@ -475,7 +522,7 @@ function media_registration_data($name) {
 function media_get_streams($streams, $node_type, $field, $uid) {
   // get all the registrations that define the streams
   $registrations = media_get_registered_modules($streams);
-  foreach ($registrations as $registration) {
+  foreach ($registrations as $id => $registration) {
     // get the callback function
     $function = $registration['callbacks']['stream'];
     if (function_exists($function)) {
@@ -484,6 +531,8 @@ function media_get_streams($streams, $node_type, $field, $uid) {
       $tab_name = key($item);
       // add tabs under the tab name
       $items[$tab_name][key($item[$tab_name])] = $item[$tab_name][key($item[$tab_name])];
+      // add the id of the registration on to the form so we can pick it back out later
+      $items[$tab_name][key($item[$tab_name])]['stream_id'] = $id;
     }
   }
   return $items;
@@ -527,7 +576,8 @@ function media_create_drawer_id($drawer_name) {
 /* *************************************************** */
 
 /**
- * Display files in a form element 
+ * Display files in a form element. Default for other modules
+ * to make use of.
  * @param array $files
  *   array of (uri => uri, filename => filename, meta => array(key => value))
  * @param string $title

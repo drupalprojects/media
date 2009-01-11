@@ -4,7 +4,9 @@
 
 /**
  * This function builds the form elements for the file formater based
- * on the node type and field for settings and the file extension to get the formaters 
+ * on the node type and field for settings and the file extension to get the formaters
+ * @param string $stream_id
+ *   the id of the stream creating this formatter
  * @param string $node_type
  *   the kind of node
  * @param string $field
@@ -14,19 +16,30 @@
  * @param string $file_extension
  *   the kind of file that will be operated on
  */
-function media_ahah_formatter_load($node_type, $field = '', $uri = 'file://', $file_extension = '') {
+function media_ahah_formatter_load($stream_id, $node_type, $field = null, $file_extension = null) {
   global $user;
+  
+  // get the file creator for this item
+  $file_creator = media_get_registered_modules(array($stream_id));
+  
   // get the formaters for this node type
   $formatters = media_active_fields_for_node_type($node_type, 'formatter');
   // get the registrations
-  $registrations = media_get_registered_modules($formatters[$field], 'formatter');
+  //print_r( media_get_registered_modules());
+  $registrations = media_get_registered_modules($formatters[$field]);
+
+  // remove any non-applying registrations
+  $registrations = media_get_applicable_formatters($registrations, $file_extension);
+  
   // get all the formatting forms
   $formatter_options = array();
   $forms = array();
   foreach ($registrations as $id => $registration) {
     $formatter_options[$id] = $registration['name'];
     $function = $registration['callbacks']['form'];
-    $forms[$id] = $function($node_type, $field, $uri, $file_extension);    
+    if (function_exists($function)) {
+      $forms[$id] = $function($node_type, $field, $file_extension);
+    }    
   }
   return drupal_json(drupal_get_form('media_formater_ahah_form', $formatter_options, $forms)); //, $forms)); //, $formatter_options, $forms));
 }
@@ -49,7 +62,7 @@ function media_formater_ahah_form($form_state, $options, $forms) {
   
   // if we only have one option, display that
   if (count($options) > 1) { 
-    $form['formatter']['formatter_select'] = array(    
+    $form['formatter']['formatter_select'] = array(
       '#type' => 'select',
       '#title' => t('Select the formater to use'),
       '#options' => $options,

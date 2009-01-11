@@ -21,7 +21,6 @@ function media_upload_media_register() {
       // human readable name
       'name' => t('Media Upload stream'),
       'kind' => 'stream', 
-      'uri' => 'file',
       'types' => '*',
       'description' => t('Drupal uploaded files'),
       // function to invoke when data is needed from this 
@@ -37,7 +36,6 @@ function media_upload_media_register() {
     'media_upload_display' => array(
       // human readable name
       'name' => t('Media Drupal Upload display FORMATTER'),
-      'uri' => 'file',
       'kind' => 'formatter',
       'callbacks' => array(
         'form' => 'media_upload_formatter_form',
@@ -60,6 +58,20 @@ function media_upload_media_register() {
        ),      
        // human readable description
       'description' => t('Provides integration with Drupal\'s Upload module'),
+      'fields' => array('attachments', 'filefield'),
+    ),
+    'media_mover' => array(
+      // human readable name
+      'name' => t('Media Mover files'),
+      'uri' => 'file',
+      'kind' => 'stream',
+      'types' => '*',
+      'description' => t('Integrate Media Mover files'),
+      'callbacks' => array( 
+        'stream' => 'media_upload_media_mover_stream',
+       ),      
+       // human readable description
+      'description' => t('Provides integration with Media Mover'),
       'fields' => array('attachments', 'filefield'),
     ),
   );
@@ -111,7 +123,6 @@ function media_upload_media_user_files_select2($node_type, $field, $uid) {
 }
 
 
-
 /**
  * Display the upload form for the tab 
  * @return string
@@ -123,4 +134,22 @@ function media_upload_display_upload_form() {
     '#size' => 30,
    );
    return $form;
+}
+
+
+function media_upload_media_mover_stream($node_type, $field, $uid) {
+  $files = array();
+  $results = db_query('SELECT complete_file FROM {media_mover_files} ');
+  while ($file = db_fetch_array($results)) {
+    $files[] = array(
+      'uri' => $file['complete_file'],
+      'filename' => basename($file['complete_file']),
+      'meta' => '',
+    );
+  }  
+  return array( 
+    t('My files') => array(
+      t('Media Mover') => media_display_user_files_form($files, t('Your Media Mover files')),     
+    )
+  );
 }
