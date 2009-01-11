@@ -117,7 +117,7 @@ function media_upload_media_user_files_select($node_type, $field, $uid) {
 function media_upload_media_user_files_select2($node_type, $field, $uid) {
   return array(
     t('Add files') => array(
-      t('SWF file') => media_upload_display_upload_form(),
+      t('Embeded file') => media_upload_display_embed_form(),
     )
   );
 }
@@ -136,6 +136,17 @@ function media_upload_display_upload_form() {
    return $form;
 }
 
+/**
+ * Display the upload form for the tab 
+ * @return string
+ */ 
+function media_upload_display_embed_form() {
+  $form['media_upload']['upload'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Upload your file'),
+   );
+   return $form;
+}
 
 function media_upload_media_mover_stream($node_type, $field, $uid) {
   $files = array();
