@@ -16,7 +16,6 @@
  */
 function media_ahah_formatter_load($node_type, $field = '', $uri = 'file://', $file_extension = '') {
   global $user;
-
   // get the formaters for this node type
   $formatters = media_active_fields_for_node_type($node_type, 'formatter');
   // get the registrations
@@ -26,22 +25,38 @@ function media_ahah_formatter_load($node_type, $field = '', $uri = 'file://', $f
   $forms = array();
   foreach ($registrations as $id => $registration) {
     $formatter_options[$id] = $registration['name'];
-    $function = $registration['callback'];
+    $function = $registration['callbacks']['form'];
     $forms[$id] = $function($node_type, $field, $uri, $file_extension);    
   }
-
   return drupal_json(drupal_get_form('media_formater_ahah_form', $formatter_options, $forms)); //, $forms)); //, $formatter_options, $forms));
 }
 
 
+/**
+ * AHAH form displayed under the file selector
+ *
+ * @param array $form_state
+ * @param array $options
+ * @param array $forms
+ * @return array
+ *   drupal form array
+ */
 function media_formater_ahah_form($form_state, $options, $forms) {
-  $form['formatter_select'] = array(    
-    '#type' => 'select',
-    '#title' => t('Select the formater to use'),
-    '#options' => $options,
+  $form['formatter'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Format options'),
   );
-  $form[] = $forms;
-  $form['submit'] = array(
+  
+  // if we only have one option, display that
+  if (count($options) > 1) { 
+    $form['formatter']['formatter_select'] = array(    
+      '#type' => 'select',
+      '#title' => t('Select the formater to use'),
+      '#options' => $options,
+    );
+  }
+  $form['formatter'][] = $forms;
+  $form['formatter']['submit'] = array(
     '#type' => 'submit',
     '#value' => 'format'  
   );  

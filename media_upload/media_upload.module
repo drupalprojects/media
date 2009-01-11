@@ -17,17 +17,17 @@
   */
 function media_upload_media_register() {
   $registration = array(
-    'media_upload_container' => array(
+    'media_upload_stream' => array(
       // human readable name
-      'name' => t('Media Upload container'),
-      // kind of item, one of container, format, insert, post_format
-      'kind' => 'container', 
+      'name' => t('Media Upload stream'),
+      'kind' => 'stream', 
       'uri' => 'file',
-      // this is the default value, otherwise array of options
       'types' => '*',
       'description' => t('Drupal uploaded files'),
       // function to invoke when data is needed from this 
-      'callback' => 'media_upload_media_user_files_select',
+      'callbacks' => array(
+        'stream' => 'media_upload_media_user_files_select',
+      ),
       // human readable description
       'description' => t('Provides integration with Drupal\'s Upload module'),
       // cck field types that this works on
@@ -38,10 +38,10 @@ function media_upload_media_register() {
       // human readable name
       'name' => t('Media Drupal Upload display FORMATTER'),
       'uri' => 'file',
-      // kind of item, one of     
-      // container, format, insert, post_format
       'kind' => 'formatter',
-      'callback' => 'media_upload_formatter_form',     
+      'callbacks' => array(
+        'form' => 'media_upload_formatter_form',
+      ),     
       'types' => '*',
       'description' => t('Format Drupal uploaded files'),       
       // human readable description
@@ -52,16 +52,16 @@ function media_upload_media_register() {
       // human readable name
       'name' => t('Media Drupal Upload display'),
       'uri' => 'file',
-      // kind of item, one of     
-      // container, format, insert, post_format
-      'kind' => 'container',
+      'kind' => 'stream',
       'types' => '*',
       'description' => t('Format Drupal uploaded files'),
-      'callback' => 'media_upload_media_user_files_select2',      
+      'callbacks' => array( 
+        'stream' => 'media_upload_media_user_files_select2',
+       ),      
        // human readable description
       'description' => t('Provides integration with Drupal\'s Upload module'),
       'fields' => array('attachments', 'filefield'),
-    )  
+    ),
   );
   return $registration;
 }
@@ -105,7 +105,7 @@ function media_upload_media_user_files_select($node_type, $field, $uid) {
 function media_upload_media_user_files_select2($node_type, $field, $uid) {
   return array(
     t('Add files') => array(
-      t('SWF file') => array('#value' => 'adsfasdf', 0 => media_upload_display_upload_form()),
+      t('SWF file') => media_upload_display_upload_form(),
     )
   );
 }

@@ -62,7 +62,7 @@ function media_admin_settings($form, $type_name = null) {
 
     // build a form for each type of module that we have  
     foreach (media_registration_kinds() as $kind) {
-      // get all the containers that match this field
+      // get all the kinds that match this field
       if ($registrations = media_get_fields($field['type'], $kind)) {
         $options = array();
         foreach ($registrations as $id => $registration) {

@@ -50,8 +50,8 @@ function media_form_alter (&$form, $form_state, $form_id) {
     if (variable_get('media_'. $form['type']['#value'] .'_enabled', null)) {
       // get the fields we need to enable on this module
       $fields = media_active_fields_for_node_type($form['type']['#value']);
-      foreach ($fields as $field => $containers) {
-        $form[$field]['media'] = media_build_browser($containers, $form['type']['#value'], $field, $user->uid);
+      foreach ($fields as $field => $streams) {
+        $form[$field]['media'] = media_build_browser($streams, $form['type']['#value'], $field, $user->uid);
         $form[$field][0]['#attributes'] = array('class' => 'media replace');        
       }
     }    
@@ -119,26 +119,26 @@ function media_get_registered_modules($ids = null) {
 /**
  * Get all module data that uses the "media_user_files_select" hook
  * @TODO clean this form up and use a form theme function
- * @param array  $containers
- *   array of container functions to call
+ * @param array $streams
+ *   array of stream functions to call
  * @param string $node_type
  * @param string $field
  * @param uid $uid
  * @return array
  *   drupal form array
  */
-function media_build_browser($containers, $node_type, $field, $uid) {
+function media_build_browser($streams, $node_type, $field, $uid) {
   $items = array();
   $form = array();
     
-  // get all the containers 
-  $containers = media_get_containers($containers, $node_type, $field, $uid);
+  // get all the streams 
+  $streams = media_get_streams($streams, $node_type, $field, $uid);
 
   // now we order modules into tabs structure
   // @TODO implement admin weighting here somehow
   // @TODO clean this crap up! 
   // split the tabs into sets of drawers
-  foreach ($containers as $tab_name => $drawer_items) {
+  foreach ($streams as $tab_name => $drawer_items) {
     $first = true;
     $drawers = array();
     // now create the sub element (drawer)
@@ -319,7 +319,7 @@ function _media_admin_form_perm_append($form, $append, $permissions) {
  * @return array
  *   array of full registration objects
  */
-function media_get_fields($field_type, $function_type = 'container') {
+function media_get_fields($field_type, $function_type = 'stream') {
   static $data;
   
   // do we have cached version?
@@ -353,7 +353,7 @@ function media_get_fields($field_type, $function_type = 'container') {
  * @return array
  */
 function media_registration_kinds() {
-  return array('container', 'formatter');
+  return array('stream', 'formatter');
 }
 
 
@@ -363,7 +363,7 @@ function media_registration_kinds() {
 
 /**
  * Parsing function for the registrations to hand back the kinds 
- * of modules registering. Used to select all formatters, containers, etc
+ * of modules registering. Used to select all formatters, streams, etc
  * @param string $kinds
  *   return all the matching registrations of this kind
  * @return array
@@ -464,25 +464,27 @@ function media_registration_data($name) {
 
 
 /**
- * Fetches all containers registered in $contaienrs 
+ * Fetches all streams registered in $streams 
  *
- * @param array $containers
+ * @param array $streams
  * @param string $node_type
  * @param field $field
  * @param int $uid
  * @return array
  */
-function media_get_containers($containers, $node_type, $field, $uid) {
-  // get all the registrations that define the containers
-  $registrations = media_get_registered_modules($containers);
+function media_get_streams($streams, $node_type, $field, $uid) {
+  // get all the registrations that define the streams
+  $registrations = media_get_registered_modules($streams);
   foreach ($registrations as $registration) {
     // get the callback function
-    $function = $registration['callback'];
-    // get the results of the callback function
-    $item = $function($node_type, $field, $uid);
-    $tab_name = key($item);
-    // add tabs under the tab name
-    $items[$tab_name][key($item[$tab_name])] = $item[$tab_name][key($item[$tab_name])];
+    $function = $registration['callbacks']['stream'];
+    if (function_exists($function)) {
+      // get the results of the callback function
+      $item = $function($node_type, $field, $uid);
+      $tab_name = key($item);
+      // add tabs under the tab name
+      $items[$tab_name][key($item[$tab_name])] = $item[$tab_name][key($item[$tab_name])];
+    }
   }
   return $items;
 }
@@ -494,18 +496,18 @@ function media_get_containers($containers, $node_type, $field, $uid) {
  * @param string $type
  *   drupal node type
  * @param string $function
- *   one of container, formatter
+ *   one of stream, formatter
  * @return array
  *   array of field names
  */
-function media_active_fields_for_node_type($type, $function = 'container') {  
+function media_active_fields_for_node_type($type, $function = 'stream') {  
   $items = variable_get('media_'. $type .'_'. $function, array());
   $data = array(); 
   foreach ($items as $id => $item) {
     // we need to split the $id into $field_name and $media registration id
     $item = explode('--', $id);
     $data[$item[0]][] = $item[1];    
-  }  
+  }
   return $data;
 }
 
@@ -594,6 +596,33 @@ function media_tabs_form($forms) {
 /* Media Hook Implementations                */
 /* ***************************************** */
 
+
+/**
+ * Implementation of hook_media_register
+ * @return array
+ *
+ */
+function media_media_register() {
+  $registration = array( 
+    'media_user_files' => array(
+      // human readable name
+      'name' => t('User files'),
+      'uri' => 'file',
+      'kind' => 'stream',
+      'types' => '*',
+      'description' => t('Format Drupal uploaded files'),
+      'callbacks' => array( 
+        'stream' => 'media_display_user_files',
+       ),      
+       // human readable description
+      'description' => t('Displays all of current user\'s files'),
+      'fields' => array('attachments', 'filefield'),
+    )
+  );
+  return $registration;
+}
+   
+
 /**
  * Implementation of hook_media_user_files_select
  *
@@ -601,7 +630,7 @@ function media_tabs_form($forms) {
  * @param string $field
  * @param int $uid
  */
-function media_media_user_files_select($node_type, $field, $uid) {
+function media_display_user_files($node_type, $field, $uid) {
   $files = array();
   $results = db_query('SELECT filepath, filename FROM {files} WHERE uid = %d', $uid);
   while ($file = db_fetch_array($results)) {
@@ -613,15 +642,7 @@ function media_media_user_files_select($node_type, $field, $uid) {
   }
   $return = array( 
     t('My files') => array(
-      t('Local') => array( 
-        'form' => media_display_user_files_form($files, t('Your files')),
-      ),
-      t('FTP') => array( 
-        'form' => array('#value' => 'this would be the FTP files<br /><br /><br /><br /><br /><br /><br /><br /><br />'),
-      ),
-      t('Yahoo') => array( 
-        'form' => array('#value' => 'this would be the yahoo files'),
-      )
+      t('Local') => media_display_user_files_form($files, t('Your files')),     
     )
   );
   return $return;
