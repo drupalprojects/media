@@ -35,7 +35,24 @@ function media_menu() {
     'page arguments' => array('media_admin_settings'),
     'access arguments' => array('administer media'),
     'file' => 'media_admin.inc',
+    'type' => MENU_SUGGESTED_ITEM,
   );
+  
+  // build pages for each content type
+  $content_types = node_get_types();
+  if ($content_types) {
+    foreach ($content_types as $content_type) {
+      $items['admin/content/media/'. $content_type->type] = array(
+        'title' => $content_type->name,
+        'description' => 'Configure Media settings for '. $content_type->name,
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('media_admin_settings', $content_type->type),
+        'access arguments' => array('administer media'),
+        'file' => 'media_admin.inc',
+        'type' => MENU_SUGGESTED_ITEM,
+      );
+    }
+  }
   
   return $items;
 }
