@@ -46,6 +46,25 @@
  
  
  /**
+  * we need to hide any form elements that were replaced by the media browser form
+  * activate the add button, and hide the browser
+  */
+ $(document).ready(function () {
+   $('.media.replace').hide();
+   $('.media.browser.activation').each(function () {
+     $(this).next('.media.browser').hide();
+     $(this).click(function () {
+       $(this).next('.media.browser').slideDown('slow');
+       $(this).slideUp();
+     });
+   }); 
+   
+ });
+ 
+ 
+ 
+ 
+ /**
   * This handles passing the current file data from the media browser
   * to the formater function and returns the correct form elements
   */

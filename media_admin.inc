@@ -54,29 +54,26 @@ function media_admin_settings($form, $type_name = null) {
     '#default_value' => variable_get('media_'. $type_name .'_enabled', null),
   );
   
-  // define the kinds of options are available per field
-  $kinds = array('container', 'formatter');
-  
   // extract the fields for this node type
   foreach ($type['fields'] as $field) {        
     $form[$field['field_name']] = array(
       '#value' => t('Field name: !name', array('!name' => $field['widget']['label'])),
     );
-        
+
     // build a form for each type of module that we have  
-    foreach ($kinds as $kind) {
-      // get all the containers that match this field
+    foreach (media_registration_kinds() as $kind) {
+      // get all the containers that match this field      
       if ($registrations = media_get_fields($field['type'], $kind)) {
         $options = array();
         foreach ($registrations as $id => $registration) {
-          $options[$id] = $registration['name'] .': '. $registration['kind'][$kind]['description'];
+          $options[$field['field_name'] .'--'. $id] = $registration['name'] .': '. $registration['description'];
         }
-        $form[$field['field_name']][$field['field_name'] .'_media_'. $kind .'_enable'] = array(
+        $form[$field['field_name']]['media_'. $type_name .'_'. $kind] = array(
           '#title' => t('Enable file options for this field'),
           '#description' => t('Choose which file options you would like to have enabled on this field'),
           '#type' => 'checkboxes',
           '#options' => $options,
-          '#default_value' => variable_get($field['field_name'] .'_media_'. $kind .'_enable', array()),
+          '#default_value' => variable_get('media_'. $type_name .'_'. $kind, array()),
         );
       }       
     }

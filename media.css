@@ -6,6 +6,15 @@
  */
  
  
+/* Style the show media browser link */
+.media.browser.activation{
+  width: 100px;
+  border: 1px solid #999999;
+  padding: 5px 10px;
+  background-color: #cc3355;
+  color: #ffffff;
+}
+ 
 .media.browser {
   border: 1px solid #999999;
   padding: 5px;

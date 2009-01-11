@@ -48,10 +48,13 @@ function media_form_alter (&$form, $form_state, $form_id) {
   // add the media browser on the node add/edit screen
   if (strstr($form_id, 'node_form') ) {
     // is the media browser enabled on this node type?
-    if (variable_get('media_'. $form['type']['#value'] .'_enabled', null)) {    
-      // display the media browser form
-      $form['test'] = media_get_user_file_options('', '', $user->uid);   
-      $form['test']['#weight'] = -9;
+    if (variable_get('media_'. $form['type']['#value'] .'_enabled', null)) {
+      // get the fields we need to enable on this module
+      $fields = media_active_fields_for_node_type($form['type']['#value']);
+      foreach ($fields as $field => $containers) {
+        $form[$field]['media'] = media_build_browser($containers, $form['type']['#value'], $field, $user->uid);
+        $form[$field][0]['#attributes'] = array('class' => 'media replace');        
+      }
     }    
   }
 }
@@ -82,9 +85,13 @@ function media_theme() {
 /* ***************************************** */
 
 /**
- * Gets all of the modules which register with ReMiG
+ * Gets all of the modules which register with Media
+ * @param array $ids
+ *   only return the specified ids
+ * @return array 
+ *   of registrations 
  */
-function media_get_registered_modules() {
+function media_get_registered_modules($ids = null) {
   static $registrations;
   if (! $registrations) {
     $registrations = array();
@@ -98,7 +105,13 @@ function media_get_registered_modules() {
         $registration[$key]['module'] = $module;
       }
       $registrations = array_merge($registrations, $registration); 
+    }            
+  }
+  if ($ids) {
+    foreach ($ids as $id) {
+      $return[$id] = $registrations[$id];
     }
+    $registrations = $return;
   }
   return $registrations;  
 }
@@ -107,32 +120,34 @@ function media_get_registered_modules() {
 /**
  * Get all module data that uses the "media_user_files_select" hook
  * @TODO clean this form up and use a form theme function
+ * @param array  $containers
+ *   array of container functions to call
  * @param string $node_type
  * @param string $field
  * @param uid $uid
  * @return array
  *   drupal form array
  */
-function media_get_user_file_options($node_type, $field, $uid) {
+function media_build_browser($containers, $node_type, $field, $uid) {
   $items = array();
   $form = array();
-  // get all the modules which implement file select options
-  foreach (module_implements('media_user_files_select') as $module) {
-    $function = $module .'_media_user_files_select';
-    $items = array_merge($items, $function($node_type, $field, $uid));
-  }
+    
+  // get all the containers 
+  $containers = media_get_containers($containers, $node_type, $field, $uid);
 
   // now we order modules into tabs structure
-  // @TODO implement admin weighting here some how
-  foreach ($items as $tab_name => $item) {
-    $drawers = array();
+  // @TODO implement admin weighting here somehow
+  // @TODO clean this crap up! 
+  // split the tabs into sets of drawers
+  foreach ($containers as $tab_name => $drawer_items) {
     $first = true;
-    // now create the sub element (drawer)    
-    foreach($item as $drawer_name => $data ) {
+    $drawers = array();
+    // now create the sub element (drawer)
+    foreach ($drawer_items as $drawer_name => $form ) {
       // strip out any scary stuff so we can make an id
-      $drawer_id = str_replace(array(' ', "'", '"', "%", "<", ">"), '', $drawer_name);
-      // create all the drawers
-      $drawers[] =  '<a onclick="javascript: false;" href="#'. $drawer_id .'">'. $drawer_name .'</a>';
+      $drawer_id = media_create_drawer_id($drawer_name);
+      // create the drawer entry
+      $drawers[] = '<a onclick="javascript: return false;" href="#'. $drawer_id .'">'. $drawer_name .'</a>';
       
       // add a add buton on each item
       // @TODO this needs AHAH support
@@ -140,12 +155,12 @@ function media_get_user_file_options($node_type, $field, $uid) {
         '#type' => 'button',
         '#value' => t('Add')
       );
-      $my_files_elements[$tab_name][$drawer_name] = array(
+      $my_files_elements[$tab_name][$drawer_id] = array(
         '#type' => 'markup',
         '#value' => '',
         '#prefix' => '<div class="media browser display '. ($first ? 'first': '') .'" id="'. $drawer_id .'"><a name="'. $drawer_id .'"/>',
         '#suffix' => '</div>',
-        'content' => $item[$drawer_name]['form'],
+        'content' => $form,
       );
       $first = false;
     }
@@ -153,7 +168,10 @@ function media_get_user_file_options($node_type, $field, $uid) {
     $my_files_elements[$tab_name]['drawers']['#value'] = '<div class="drawers">'. theme('item_list', $drawers) .'</div>';
     $my_files_elements[$tab_name]['drawers']['#weight'] = -9;
   }
-  return media_tabs_form($my_files_elements);  
+
+  //print_r(media_tabs_form($my_files_elements));
+  return media_tabs_form($my_files_elements);
+  
 }
 
 
@@ -319,14 +337,19 @@ function media_get_fields($field_type, $function_type = 'container') {
       }
     }
   }
-
   return $data[$field_type][$function_type];
 }
 
-function media_get_formaters() {
-  
-  
+
+/**
+ * Build a list of possible registration types
+ *
+ * @return array
+ */
+function media_registration_kinds() {
+  return array('container', 'formatter');
 }
+
 
 /* ***************************************** */
 /* Media Internal Functions                  */
@@ -339,7 +362,7 @@ function media_get_formaters() {
  *   return all the matching registrations of this kind
  * @return array
  */
-function media_registration_kinds($kind = null) {
+function media_get_registration_kinds($kind = null) {
   $kinds = array();
   // get the registered modules
   $registrations = media_get_registered_modules();
@@ -434,6 +457,61 @@ function media_registration_data($name) {
 }
 
 
+/**
+ * Fetches all containers registered in $contaienrs 
+ *
+ * @param array $containers
+ * @param string $node_type
+ * @param field $field
+ * @param int $uid
+ * @return array
+ */
+function media_get_containers($containers, $node_type, $field, $uid) {
+  // get all the registrations that define the containers
+  $registrations = media_get_registered_modules($containers);
+  foreach ($registrations as $registration) {
+    // get the callback function
+    $function = $registration['callback'];
+    // get the results of the callback function
+    $item = $function($node_type, $field, $uid);
+    $tab_name = key($item);
+    // add tabs under the tab name
+    $items[$tab_name][key($item[$tab_name])] = $item[$tab_name][key($item[$tab_name])];
+  }
+  return $items;
+}
+
+
+/**
+ * Get a list of fields for the requested node type
+ *
+ * @param string $type
+ * @param string $function
+ * @return array
+ *   array of field names
+ */
+function media_active_fields_for_node_type($type, $function = 'container') {  
+  $items = variable_get('media_'. $type .'_'. $function, array());
+  $data = array(); 
+  foreach ($items as $id => $item) {
+    // we need to split the $id into $field_name and $media registration id
+    $item = explode('--', $id);
+    $data[$item[0]][] = $item[1];    
+  }  
+  return $data;
+}
+
+
+/**
+ * Sanitize the incoming name to be used for a html #id
+ *
+ * @param string $drawer_name
+ * @return string
+ */
+function media_create_drawer_id($drawer_name) {
+  return str_replace(array(' ', "'", '"', "%", "<", ">"), '', $drawer_name);  
+}
+
 /* *************************************************** */
 /* Media forms                                         */
 /* *************************************************** */
@@ -471,31 +549,38 @@ function media_display_user_files_form($files, $title = null) {
  * @return array
  */
 function media_tabs_form($forms) {
+  // @TODO this should not depend on the tabs module
   if (module_exists('tabs')) {
     // load our css
     drupal_add_css(drupal_get_path('module', 'media') .'/media.css');
     // load our js
     drupal_add_js(drupal_get_path('module', 'media') .'/media.js');
     
-    $form = array();  
+    $form = array();
+    // build the activator for the media browser 
+    $form['media_browser_activate'] = array(
+      '#type' => 'markup',
+      '#value' => '<div class="media browser activation">'. t('Add files') .'</div>',  
+    );
     $form['media_tabs'] = array(
       '#type' => 'tabset',
       '#attributes' => array('class' => 'media browser clearfix'),
-    );
-    foreach ($forms as $id => $element) {
-      $form['media_tabs']['tab_'. $id] = array(
+    );    
+    foreach ($forms as $tab_name => $form_data) {
+      $form['media_tabs']['tab_'. $tab_name] = array(
         '#type' => 'tabpage',
-        '#title' => $id,
-        'content' => $element,
+        '#title' => $tab_name,
+        'content' => $form_data,
         '#suffix' => '<br class="clear" />',
       );
     }
   }
   else {
-    $form = theme('media_no_tab_display', $tabs);
+    $form = theme('media_no_tab_display', $forms);
   }
   return $form;
 }
+
 
 /* ***************************************** */
 /* Media Hook Implementations                */
@@ -524,7 +609,7 @@ function media_media_user_files_select($node_type, $field, $uid) {
         'form' => media_display_user_files_form($files, t('Your files')),
       ),
       t('FTP') => array( 
-        'form' => array('#value' => 'this would be the FTP files<br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />'),
+        'form' => array('#value' => 'this would be the FTP files<br /><br /><br /><br /><br /><br /><br /><br /><br />'),
       ),
       t('Yahoo') => array( 
         'form' => array('#value' => 'this would be the yahoo files'),
