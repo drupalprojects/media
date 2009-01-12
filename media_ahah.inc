@@ -5,8 +5,8 @@
 /**
  * This function builds the form elements for the file formater based
  * on the node type and field for settings and the file extension to get the formaters
- * @param string $stream_id
- *   the id of the stream creating this formatter
+ * @param string $registration_id
+ *   the id of the registration creating this formatter
  * @param string $node_type
  *   the kind of node
  * @param string $field
@@ -16,9 +16,23 @@
  * @param string $file_extension
  *   the kind of file that will be operated on
  */
-function media_ahah_formatter_load($stream_id, $node_type, $field = null, $file_extension = null) {
+function media_ahah_formatter_load($registration_id, $node_type, $field) {
+  // Get the cache form data
+  $form = form_get_cache($_POST['form_build_id'], &$cached_form_state);
+  // 
+  
+  //return drupal_json(''
+  
+  //eturn drupal_json('<pre>'. print_r($_POST, true) .'</pre><pre>'.print_r($form, true) .'</pre>');
+  
+  media_ahah_debug($_POST);
+  
+  exit();
+  
+  
   global $user;
   
+ 
   // get the file creator for this item
   $file_creator = media_get_registered_modules(array($stream_id));
   
@@ -42,6 +56,14 @@ function media_ahah_formatter_load($stream_id, $node_type, $field = null, $file_
     }    
   }
   return drupal_json(drupal_get_form('media_formater_ahah_form', $formatter_options, $forms)); //, $forms)); //, $formatter_options, $forms));
+}
+
+
+function media_ahah_debug($array) {
+  
+  drupal_json('<pre>'. print_r($array, true) .'</pre>');
+  exit();
+  
 }
 
 

@@ -16,7 +16,7 @@
 function media_admin_settings($form, $type_name = null) {
   $form = array();
   
-  // default page
+  // default page - no content type selected
   if (! $type_name) {
     $form['admin'] = array(
       '#value' => t('Media module settings')
@@ -35,7 +35,7 @@ function media_admin_settings($form, $type_name = null) {
     return system_settings_form($form);    
   }  
   
-  // per content type settings
+  // specific content type settings
   
   // do we have cck installed?
   if (module_exists('content')) {
@@ -55,12 +55,16 @@ function media_admin_settings($form, $type_name = null) {
   );
   
   // extract the fields for this node type
-  foreach ($type['fields'] as $field) {        
-    $form[$field['field_name']] = array(
-      '#value' => t('Field name: !name', array('!name' => $field['widget']['label'])),
-    );
+  foreach ($type['fields'] as $field_name => $field) {   
 
-    // build a form for each type of module that we have  
+    // create the field identifier
+    $form[$field['field_name']] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Field name: !name', array('!name' => $field['widget']['label'])),
+      '#collapsible' => 'true',
+    );
+    
+    // build a form for each type of module that we have   
     foreach (media_registration_kinds() as $kind) {
       // get all the kinds that match this field
       if ($registrations = media_get_fields($field['type'], $kind)) {
@@ -75,7 +79,12 @@ function media_admin_settings($form, $type_name = null) {
           '#options' => $options,
           '#default_value' => variable_get('media_'. $type_name .'_'. $kind, array()),
         );
-      }       
+      } 
+    }
+    // if we didn't get any additional data, remove this field form
+    // this is ugly but hey, sue me
+    if (count($form[$field['field_name']]) == 3) {
+      unset($form[$field['field_name']]);
     }
   }
     

@@ -74,8 +74,8 @@ function media_form_alter (&$form, $form_state, $form_id) {
     if (variable_get('media_'. $form['type']['#value'] .'_enabled', null)) {
       // get the fields we need to enable on this module
       $fields = media_active_fields_for_node_type($form['type']['#value']);
-      foreach ($fields as $field => $resources) {
-        $form[$field]['media'] = media_build_browser($resources, $form['type']['#value'], $field, $user->uid);
+      foreach ($fields as $field => $registration_ids) {
+        $form[$field]['media'] = media_build_browser($registration_ids, $form['type']['#value'], $field, $user->uid);
         $form[$field][0]['#attributes'] = array('class' => 'media replace');        
       }
     }    
@@ -150,102 +150,6 @@ function media_get_registered_modules($ids = null) {
 
 
 /**
- * Select registrations for use by matching against uri and file extension
- *
- * @param array $registrations
- *   array of extensions
- * @param string $uri
- *   the kind of uri being used
- * @param string $file_extension
- *   the current file extension
- * @return array
- *   of applicable formatters
- */
-function media_get_applicable_formatters($registrations, $file_extension) {
-  // do we have a file extension? 
-  if ($file_extension) {
-    foreach ($registrations as $id => $formatter) {
-      // does this formatter use any file type?
-      if (! $registration['types'] == MEDIA_TYPES_DEFAULT ) {
-        // we need to look and see if this file type is supported specifically
-        if (! in_array($file_extension, $registration['types'])) {
-          // this registration is not useful
-          unset($registrations[$id]);          
-        }         
-      }
-    }
-  }
-  return $registrations;
-}
-
-
-/**
- * Get all module data that uses the "media_user_files_select" hook
- * @TODO clean this form up and use a form theme function
- * @param array $resources
- *   array of resource functions to call
- * @param string $node_type
- * @param string $field
- * @param uid $uid
- * @return array
- *   drupal form array
- */
-function media_build_browser($resources, $node_type, $field, $uid) {
-  $items = array();
-  $form = array();
-    
-  // get all the resources 
-  $resources = media_get_resources($resources, $node_type, $field, $uid);
-
-  // now we order modules into tabs structure
-  // @TODO implement admin weighting here somehow
-  // @TODO clean this crap up! 
-  // split the tabs into sets of drawers
-  foreach ($resources as $tab_name => $drawer_items) {   
-    $first = true;
-    $drawers = array();
-    // now create the sub element (drawer)
-    foreach ($drawer_items as $drawer_name => $form ) {
-      // strip out any scary stuff so we can make an id
-      $drawer_id = media_create_drawer_id($drawer_name);
-      // create the drawer entry
-      $drawers[] = '<a onclick="javascript: return false;" href="#'. $drawer_id .'">'. $drawer_name .'</a>';
-      
-      // add a add buton on each item
-      // @TODO this needs AHAH support
-      $form[$drawer_id]['form']['add'] = array(
-        '#type' => 'button',
-        '#value' => t('Add'),
-        '#ahah' => array(
-          'event' => 'click',
-          'path' => 'media/ahah/'. $form['resource_id'] .'/'. $node_type .'/'. $field,
-          'wrapper' => $drawer_id .'_add',
-          'method' => 'replace',        
-        ),
-        '#suffix' => '<div id="'. $drawer_id .'_add"></div>',
-      );
-      // remove the resource id
-      unset($form['resource_id']);
-      $my_files_elements[$tab_name][$drawer_id] = array(
-        '#type' => 'markup',
-        '#value' => '',
-        '#prefix' => '<div class="media browser display '. ($first ? 'first': '') .'" id="'. $drawer_id .'"><a name="'. $drawer_id .'"/>',
-        '#suffix' => '</div>',
-        'content' => $form,
-      );
-      $first = false;
-    }
-    // now add the drawers onto the tab and make it render first
-    $my_files_elements[$tab_name]['drawers']['#value'] = '<div class="drawers">'. theme('item_list', $drawers) .'</div>';
-    $my_files_elements[$tab_name]['drawers']['#weight'] = -9;
-  }
-
-  return media_tabs_form($my_files_elements);
-  
-}
-
-
-/**
  * Generic hook call for media
  *
  * @param string $hook
@@ -257,120 +161,27 @@ function media_extend($hook) {
   // get a list of the modules that implement this hook
   foreach (module_implements($hook) as $module) {
     // add the data keyed by module name
-    $data[$module] = module_invoke($module, $hook);
+    if ($result = module_invoke($module, $hook)) {
+      $data[$module] = $result;
+    }
   }
   if (count($data)) {return $data; }
 }
 
-
-/**
- * This handles all the admin hooks that do not
- * require the passing of a file object. This does not use
- * module_invoke_all() so that the array of data can be 
- * keyed by the module name for ease of usage later
- * @param string $hook
- *  name of the hook being called
- * @return array
- *  array of data from each module that implements the hook
- */
-function media_admin_extend($hook) {
-  $data = array();
-  // get a list of the modules that implement this hook
-  foreach (module_implements($hook) as $module) {
-    // add the data keyed by module name
-    $data[$module] = module_invoke($module, $hook);
-  }
-  if (count($data)) {return $data; }
-}
-
-
-/**
- * This allows admins to to configure specific settings
- * per module for media.
- * @return array
- *   drupal form array
- */
-function media_admin_module_options_settings_form() {
-  if (! $options = media_admin_extend('media_admin_options_settings')) {
-    drupal_set_message(t('Sorry, there are no modules which have configurable settings.'));
-    return;
-  }
-  // build a fieldset per module
-  foreach ($options as $module_name => $option) {
-    $form[$module_name] = array(
-      '#type' => 'fieldset',
-      '#title' => $module_name
-    );
-    $form[$module_name][] = $options;
-  }
-  return $form;
-}
-
-
-/**
- * This takes all of the modules that implement the media permissions 
- * hook, gets them on a page, and adds a roll setting to control access
- * @return array
- *  drupal form array
- */
-function media_admin_module_options_permissions_form() {
-  // get any cached permissions for the permisisons 
-  $permissions = unserialize(variable_get('media_admin_permissions', array()));
-  if (! $options = media_admin_extend('media_admin_permissions_settings', $permissions)) {
-    drupal_set_message(t('Sorry, there are no modules which have configurable permissions settings.'));
-    return;
-  }
-  
-  // build a fieldset per module
-  foreach ($options as $module_name => $option) {
-    $form[$module_name] = array(
-      '#type' => 'fieldset',
-      '#title' => $module_name
-    );
-    
-    // create the roll form item
-    $append = array(
-      '#type' => 'select',
-      '#title' => t('Permissions'),
-      '#multiple' => true,
-    );
-    // now we need to itterate through the incoming form and append 
-    // the roll setting to each item
-    $form[$module_name] = _media_admin_form_perm_append($option, $append, $permissions['module']);
-    
-    $form[$module_name][] = $options;
-  }
-}
-
-
-/**
- * This is a helper function to add in a permissions element 
- * for each of the options that are access
- * @param array $form
- *   the drupal form array that will have items appended to it
- * @param array $append
- *   the form element that will be appended to the form
- * @param array $permissions
- *   permissions saved for this module
- * @return array
- *   drupal form array
- */
-function _media_admin_form_perm_append($form, $append, $permissions) {
-  foreach ($form as $type => $element) {
-    if ($type = '#title') {
-      $form[$element .'_perm'] = $append;
-      $form[$element .'_perm']['#default_value'] = $permissions[$element .'_perm'];
-    }
-    elseif (is_array($element)) {
-      $form[$type][] = _media_admin_form_perm_append($element, $append, $permissions);
-    }
-  }
-  return $form;
-}
 
 /* ***************************************** */
 /* Media API Functions                       */
 /* ***************************************** */
+
+/**
+ * Build a list of possible registration types
+ *
+ * @return array
+ */
+function media_registration_kinds() {
+  return array('resource', 'formatter');
+}
+
 
 
 /**
@@ -412,12 +223,32 @@ function media_get_fields($field_type, $function_type = 'resource') {
 
 
 /**
- * Build a list of possible registration types
+ * Select registrations for use by matching against uri and file extension
  *
+ * @param array $registrations
+ *   array of extensions
+ * @param string $uri
+ *   the kind of uri being used
+ * @param string $file_extension
+ *   the current file extension
  * @return array
+ *   of applicable formatters
  */
-function media_registration_kinds() {
-  return array('resource', 'formatter');
+function media_get_applicable_formatters($registrations, $file_extension) {
+  // do we have a file extension? 
+  if ($file_extension) {
+    foreach ($registrations as $id => $formatter) {
+      // does this formatter use any file type?
+      if (! $registration['types'] == MEDIA_TYPES_DEFAULT ) {
+        // we need to look and see if this file type is supported specifically
+        if (! in_array($file_extension, $registration['types'])) {
+          // this registration is not useful
+          unset($registrations[$id]);          
+        }         
+      }
+    }
+  }
+  return $registrations;
 }
 
 
@@ -529,16 +360,20 @@ function media_registration_data($name) {
 
 /**
  * Fetches all resources registered in $resources 
- *
- * @param array $resources
+ * @TODO implement admin weighting here somehow
+ * @param array $registration_ids
+ *   array of registration ids to be loaded
  * @param string $node_type
+ *   drupal node type
  * @param field $field
+ *   CCK field name
  * @param int $uid
+ *   drupal user id
  * @return array
  */
-function media_get_resources($resources, $node_type, $field, $uid) {
+function media_get_resources($registration_ids, $node_type, $field, $uid) {
   // get all the registrations that define the resources
-  $registrations = media_get_registered_modules($resources);
+  $registrations = media_get_registered_modules($registration_ids);
   foreach ($registrations as $id => $registration) {
     // get the callback function
     $function = $registration['callbacks']['resource'];
@@ -546,10 +381,13 @@ function media_get_resources($resources, $node_type, $field, $uid) {
       // get the results of the callback function
       $item = $function($node_type, $field, $uid);
       $tab_name = key($item);
+      // add a resource_id to the item
+      $item[$tab_name][key($item[$tab_name])]['resource_id'] = array(
+        '#type' => 'value',
+        '#value' => $id,
+      );      
       // add tabs under the tab name
       $items[$tab_name][key($item[$tab_name])] = $item[$tab_name][key($item[$tab_name])];
-      // add the id of the registration on to the form so we can pick it back out later
-      $items[$tab_name][key($item[$tab_name])]['resource_id'] = $id;
     }
   }
   return $items;
@@ -584,7 +422,7 @@ function media_active_fields_for_node_type($type, $function = 'resource') {
  * @param string $drawer_name
  * @return string
  */
-function media_create_drawer_id($drawer_name) {
+function media_create_id($drawer_name) {
   return str_replace(array(' ', "'", '"', "%", "<", ">"), '', $drawer_name);  
 }
 
@@ -593,28 +431,62 @@ function media_create_drawer_id($drawer_name) {
 /* *************************************************** */
 
 /**
- * Display files in a form element. Default for other modules
- * to make use of.
- * @param array $files
- *   array of (uri => uri, filename => filename, meta => array(key => value))
- * @param string $title
- *   option title argument
- * @return string
+ * Build data for the media browser display
+ * @TODO clean this form up and use a form theme function
+ * @param array $registration_ids
+ *   array of registrations to call
+ * @param string $node_type
+ * @param string $field
+ * @param uid $uid
+ * @return array
+ *   drupal form array
  */
-function media_display_user_files_form($files, $title = null) {
-  // pase files into options array
-  $options = array();
-  foreach ($files as $file) {
-    $options[$file['uri']] = $file['filename'];
+function media_build_browser($registration_ids, $node_type, $field, $uid) {
+  $items = array();
+  $form = array();
+    
+  // get all the resources arrays from the registration ids
+  $resources = media_get_resources($registration_ids, $node_type, $field, $uid);
+
+  // now we order modules into tabs structure
+  // @TODO clean this crap up! 
+  // split the tabs into sets of drawers
+  foreach ($resources as $tab_name => $drawer_items) {   
+    $first = true;
+    $drawers = array();
+    // now create the sub element (drawer)
+    foreach ($drawer_items as $drawer_name => $form ) {
+      // strip out any scary stuff so we can make an id
+      $drawer_id = media_create_id($drawer_name);
+      // create the drawer entry
+      $drawers[] = '<a onclick="javascript: return false;" href="#'. $drawer_id .'">'. $drawer_name .'</a>';      
+      // add an ahah add buton on each item
+      $form[$drawer_id]['form']['add'] = array(
+        '#type' => 'button',
+        '#attributes' => array('class' => 'resource add'),
+        '#value' => t('Add'),
+        '#ahah' => array(
+          'event' => 'click',
+          'path' => 'media/ahah/'. $form['resource_id']['#value'] .'/'. $node_type .'/'. $field,
+          'wrapper' => $drawer_id .'_add',
+          'method' => 'replace',        
+        ),
+        '#suffix' => '<div id="'. $drawer_id .'_add"></div>',
+      );
+      $my_files_elements[$tab_name][$drawer_id] = array(
+        '#type' => 'markup',
+        '#value' => '',
+        '#prefix' => '<div class="media browser display '. ($first ? 'first': '') .'" id="'. $drawer_id .'"><a name="'. $drawer_id .'"/>',
+        '#suffix' => '</div>',
+        'resource_form' => $form,     
+      );
+      $first = false;
+    }
+    // now add the drawers onto the tab and make it render first
+    $my_files_elements[$tab_name]['drawers']['#value'] = '<div class="drawers">'. theme('item_list', $drawers) .'</div>';
+    $my_files_elements[$tab_name]['drawers']['#weight'] = -9;
   }
-  // parse files into form elemet
-  $form['media_files'] = array( 
-    '#type' => 'select',
-    '#options' => $options,
-    '#title' => $title ? $title : '',
-    '#size' => 10,
-  );
-  return $form;
+  return media_tabs_form($my_files_elements);  
 }
 
 
@@ -633,21 +505,24 @@ function media_tabs_form($forms) {
     // load our js
     drupal_add_js(drupal_get_path('module', 'media') .'/media.js');
     
-    $form = array();
+    $form = array();    
     // build the activator for the media browser 
     $form['media_browser_activate'] = array(
       '#type' => 'markup',
       '#value' => '<div class="media browser activation">'. t('Add files') .'</div>',  
-    );
+    ); 
     $form['media_tabs'] = array(
       '#type' => 'tabset',
       '#attributes' => array('class' => 'media browser clearfix'),
     );    
     foreach ($forms as $tab_name => $form_data) {
-      $form['media_tabs']['tab_'. $tab_name] = array(
+      // get the current resource id value
+      $resource_id = $form_data[key($form_data)]['resource_form']['resource_id']['#value'];
+      // build the tab container
+      $form['media_tabs'][media_create_id('tab_'. $tab_name)] = array(
         '#type' => 'tabpage',
         '#title' => $tab_name,
-        'content' => $form_data,
+        $resource_id => $form_data,
         '#suffix' => '<br class="clear" />',
       );
     }
@@ -657,6 +532,49 @@ function media_tabs_form($forms) {
   }
   return $form;
 }
+
+
+/**
+ * Display files in a form element. Default for other modules
+ * to make use of.
+ * @param array $files
+ *   array of (uri => uri, filename => filename, meta => array(key => value))
+ * @param string $title
+ *   option title argument
+ * @return string
+ */
+function media_resource_display_user_files_form($files, $title = null) {
+  // pase files into options array
+  $options = array();
+  foreach ($files as $file) {
+    $options[$file['uri']] = $file['filename'];
+  }
+  // parse files into form elemet
+  $form['media_files'] = array( 
+    '#type' => 'select',
+    '#options' => $options,
+    '#title' => $title ? $title : '',
+    '#size' => 10,
+    '#attributes' => array('class' => 'resource select'),
+  );
+  return $form;
+}
+
+
+/**
+ * Display the upload form for the tab 
+ * @return string
+ */ 
+function media_resource_display_upload_form() {
+  $form['media_upload']['upload'] = array(
+    '#type' => 'file',
+    '#title' => t('Upload your file'),
+    '#size' => 30,
+    '#attributes' => array('class' => 'resource select'),
+   );
+   return $form;
+}
+
 
 
 /* ***************************************** */
@@ -709,7 +627,7 @@ function media_display_user_files($node_type, $field, $uid) {
   }
   $return = array( 
     t('My files') => array(
-      t('Local') => media_display_user_files_form($files, t('Your files')),     
+      t('Local') => media_resource_display_user_files_form($files, t('Your files')),     
     )
   );
   return $return;
