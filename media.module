@@ -118,15 +118,22 @@ function media_theme() {
  * Gets all of the modules which register with Media.
  * @param array $ids
  *   (Optional) If this contains an array of id strings, then return only the
- *   specified ids
+ *   specified ids.
  * @param boolean $reset
  *   (Optional) If TRUE, then reset the static cache.
  * @return array
  *   An array of registrations, keyed by implementing function name, in the
  *   form of:
  *     'module' => The module implementing the hook.
- *     'uri'    => The scheme the stream wrapper handles, such as 'public://'.
- *     'types'  =>
+ *     'uri'    => The scheme the stream wrapper handles, default is 'public://'
+ *     'types'  => The mime types this module handles, defaults to * (all).
+ *     'name'   => A human readable name, displayed on forms.
+ *     'kind'   => Kind of functionality: 'resource' or 'format'.
+ *     'description' => A verbose description of functionality.
+ *     'callbacks' => An array of key => functions called for data.
+ *     'fields' => What fields does this functionality operate on?
+ *     'validation' => @todo
+ *     'display' => @todo
  */
 function media_get_registered_modules($ids = NULL, $reset = FALSE) {
   static $registrations;
