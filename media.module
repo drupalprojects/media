@@ -78,7 +78,7 @@ function media_form_alter (&$form, $form_state, $form_id) {
   // add the media browser on the node add/edit screen
   if (strstr($form_id, 'node_form') ) {
     // is the media browser enabled on this node type?
-    if (variable_get('media_'. $form['type']['#value'] .'_enabled', null)) {
+    if (variable_get('media_'. $form['type']['#value'] .'_enabled', NULL)) {
       // get the fields we need to enable on this module
       $fields = media_active_fields_for_node_type($form['type']['#value']);
       foreach ($fields as $field => $registration_ids) {
@@ -104,7 +104,7 @@ function media_theme() {
     ),
     'media_file_browser' => array(
       'file' => 'media_theme.inc',
-      'arguments' => array('element' => null),
+      'arguments' => array('element' => NULL),
     )
   );
 }
@@ -117,22 +117,28 @@ function media_theme() {
 /**
  * Gets all of the modules which register with Media.
  * @param array $ids
- *   only return the specified ids
+ *   (Optional) If this contains an array of id strings, then return only the
+ *   specified ids
+ * @param boolean $reset
+ *   (Optional) If TRUE, then reset the static cache.
  * @return array
- *   of registrations
+ *   An array of registrations, keyed by implementing function name, in the
+ *   form of:
+ *     'module' => The module implementing the hook.
+ *     'uri'    => The scheme the stream wrapper handles, such as 'public://'.
+ *     'types'  =>
  */
-function media_get_registered_modules($ids = null) {
+function media_get_registered_modules($ids = NULL, $reset = FALSE) {
   static $registrations;
-  // only build cache if ids are not being
-  // passed in
-  if (! $registrations ) {
+  // Only build cache the first time the function is called, or if we reset it.
+  if (is_null($registrations) || $reset) {
     $registrations = array();
-    // get all the modules which implement
+    // Get all the modules which implement media_register().
     foreach (module_implements('media_register') as $module) {
       $function = $module .'_media_register';
-      // get all the registrations
+      // Get all the registrations.
       $registration = $function();
-      // add the module name to each registration
+      // Add the module name to each registration.
       foreach (array_keys($function()) as $key) {
         $registration[$key]['module'] = $module;
         if (! $registraton[$key]['uri']) {
@@ -145,7 +151,7 @@ function media_get_registered_modules($ids = null) {
       $registrations = array_merge($registrations, $registration);
     }
   }
-  // return requested registrations
+  // Return requested registrations.
   if ($ids) {
     foreach ($ids as $id) {
       $return[$id] = $registrations[$id];
@@ -271,7 +277,7 @@ function media_get_applicable_formatters($registrations, $file_extension) {
  *   return all the matching registrations of this kind
  * @return array
  */
-function media_get_registration_kinds($kind = null) {
+function media_get_registration_kinds($kind = NULL) {
   $kinds = array();
   // get the registered modules
   $registrations = media_get_registered_modules();
@@ -293,7 +299,7 @@ function media_get_registration_kinds($kind = null) {
 
 /**
  * Returns a set of formatters which can format the specified
- * item. If $description is null, all formatters will be returned. If
+ * item. If $description is NULL, all formatters will be returned. If
  * a set of registered modules can be passed in to narrow the
  * formatter options.
  * @param string $description
@@ -301,7 +307,7 @@ function media_get_registration_kinds($kind = null) {
  * @param unknown_type $registrations
  * @return array
  */
-function media_registration_item_formatters($description = '*', $registrations = null) {
+function media_registration_item_formatters($description = '*', $registrations = NULL) {
   $formatters = array();
   // get all the registrations if we don't have any
   if (! $registrations) {
@@ -327,7 +333,7 @@ function media_registration_item_formatters($description = '*', $registrations =
  *   only hand back data for the specified type
  * @return array
  */
-function media_registration_types($type = null) {
+function media_registration_types($type = NULL) {
   // get the registered modules
   $registrations = media_get_registered_modules();
   // parse the registrations
@@ -460,14 +466,14 @@ function media_build_browser($registration_ids, $node_type, $field, $uid) {
   // @TODO clean this crap up!
   // split the tabs into sets of drawers
   foreach ($resources as $tab_name => $drawer_items) {
-    $first = true;
+    $first = TRUE;
     $drawers = array();
     // now create the sub element (drawer)
     foreach ($drawer_items as $drawer_name => $form ) {
       // strip out any scary stuff so we can make an id
       $drawer_id = media_create_id($drawer_name);
       // create the drawer entry
-      $drawers[] = '<a onclick="javascript: return false;" href="#'. $drawer_id .'">'. $drawer_name .'</a>';
+      $drawers[] = '<a onclick="javascript: return FALSE;" href="#'. $drawer_id .'">'. $drawer_name .'</a>';
       // add an ahah add buton on each item
       $form[$drawer_id]['form']['add'] = array(
         '#type' => 'button',
@@ -488,7 +494,7 @@ function media_build_browser($registration_ids, $node_type, $field, $uid) {
         '#suffix' => '</div>',
         'resource_form' => $form,
       );
-      $first = false;
+      $first = FALSE;
     }
     // now add the drawers onto the tab and make it render first
     $my_files_elements[$tab_name]['drawers']['#value'] = '<div class="drawers">'. theme('item_list', $drawers) .'</div>';
@@ -551,7 +557,7 @@ function media_tabs_form($forms) {
  *   option title argument
  * @return string
  */
-function media_resource_display_user_files_form($files, $title = null) {
+function media_resource_display_user_files_form($files, $title = NULL) {
   // pase files into options array
   $options = array();
   foreach ($files as $file) {

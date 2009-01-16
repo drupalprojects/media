@@ -2,4 +2,8 @@
 
 January 2009
 ------------
+ * In media_get_registered_modules, check for NULL static variable (aaron).
+ * Add $reset option to media_get_registered_modules (aaron).
+ * Change null/true/false to NULL/TRUE/FALSE (aaron).
+ * Documentation changes (aaron).
  * Initial development of Media (arthur).
