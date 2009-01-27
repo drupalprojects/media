@@ -10,3 +10,4 @@ January 2009
  * Change null/true/false to NULL/TRUE/FALSE (aaron).
  * Documentation changes (aaron).
  * Initial development of Media (arthur).
+ * Added (perhaps temporary) dependency on tabs module (jody).
