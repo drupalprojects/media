@@ -28,13 +28,18 @@
 
 /* move the tabs to the right */
 .media.browser ul.primary {
-	margin-left: 118px;
+	margin: 0 0 0 118px;
+	border: none;
 }
 
 /* style the drawers container */
 
 
 /* style the left hand drawers */
+.media.browser .ui-tabs-panel .item-list ul {
+  margin: 0;
+}
+
 .media.browser .ui-tabs-panel .item-list ul li{
 	background-color: #999999;
 	background-image: none;
