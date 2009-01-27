@@ -42,7 +42,6 @@ function media_menu() {
     'page arguments' => array('media_admin_settings'),
     'access arguments' => array('administer media'),
     'file' => 'media_admin.inc',
-    'type' => MENU_SUGGESTED_ITEM,
   );
 
   // build pages for each content type
@@ -56,7 +55,6 @@ function media_menu() {
         'page arguments' => array('media_admin_settings', $content_type->type),
         'access arguments' => array('administer media'),
         'file' => 'media_admin.inc',
-        'type' => MENU_SUGGESTED_ITEM,
       );
     }
   }
