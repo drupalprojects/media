@@ -97,12 +97,6 @@ function media_form_alter (&$form, $form_state, $form_id) {
  */
 function media_theme() {
   return array(
-    'media_no_tabs_display' => array(
-      'file' => 'media_theme.inc',
-      'arguments' => array(
-        'tabs' => NULL,
-      ),
-    ),
     'media_file_browser' => array(
       'file' => 'media_theme.inc',
       'arguments' => array('element' => NULL),
@@ -474,7 +468,6 @@ function media_build_browser($registration_ids, $node_type, $field, $uid) {
 
   // Get all the resources arrays from the registration ids.
   $resources = media_get_resources($registration_ids, $node_type, $field, $uid);
-
   // Now we order modules into tabs structure.
   // @TODO clean this crap up!
   // Split the tabs into sets of drawers.
@@ -525,37 +518,32 @@ function media_build_browser($registration_ids, $node_type, $field, $uid) {
  * @return array
  */
 function media_tabs_form($forms) {
-  // @TODO this should not depend on the tabs module.
-  if (module_exists('tabs')) {
-    // Load our css.
-    drupal_add_css(drupal_get_path('module', 'media') .'/media.css');
-    // Load our js.
-    drupal_add_js(drupal_get_path('module', 'media') .'/media.js');
+  // @TODO We currently depend on tabs module for this.
+  // Load our css.
+  drupal_add_css(drupal_get_path('module', 'media') .'/media.css');
+  // Load our js.
+  drupal_add_js(drupal_get_path('module', 'media') .'/media.js');
 
-    $form = array();
-    // Build the activator for the media browser.
-    $form['media_browser_activate'] = array(
-      '#type' => 'markup',
-      '#value' => '<div class="media browser activation">'. t('Add files') .'</div>',
+  $form = array();
+  // Build the activator for the media browser.
+  $form['media_browser_activate'] = array(
+    '#type' => 'markup',
+    '#value' => '<div class="media browser activation">'. t('Add files') .'</div>',
+  );
+  $form['media_tabs'] = array(
+    '#type' => 'tabset',
+    '#attributes' => array('class' => 'media browser clearfix'),
+  );
+  foreach ($forms as $tab_name => $form_data) {
+    // Get the current resource id value.
+    $resource_id = $form_data[key($form_data)]['resource_form']['resource_id']['#value'];
+    // Build the tab container.
+    $form['media_tabs'][media_create_id('tab_'. $tab_name)] = array(
+      '#type' => 'tabpage',
+      '#title' => $tab_name,
+      $resource_id => $form_data,
+      '#suffix' => '<br class="clear" />',
     );
-    $form['media_tabs'] = array(
-      '#type' => 'tabset',
-      '#attributes' => array('class' => 'media browser clearfix'),
-    );
-    foreach ($forms as $tab_name => $form_data) {
-      // Get the current resource id value.
-      $resource_id = $form_data[key($form_data)]['resource_form']['resource_id']['#value'];
-      // Build the tab container.
-      $form['media_tabs'][media_create_id('tab_'. $tab_name)] = array(
-        '#type' => 'tabpage',
-        '#title' => $tab_name,
-        $resource_id => $form_data,
-        '#suffix' => '<br class="clear" />',
-      );
-    }
-  }
-  else {
-    $form = theme('media_no_tab_display', $forms);
   }
   return $form;
 }
