@@ -2,6 +2,8 @@
 
 January 2009
 ------------
+ * Made media mover code load only if media mover module_exists. (jody)
+ * Added (perhaps temporary) dependency on tabs module (jody).
  * #description sp. (aaron).
  * Documentation changes in media_admin.inc (aaron).
  * Fix PHP error on admin settings page when CCK not enabled (aaron).
@@ -10,5 +12,3 @@ January 2009
  * Change null/true/false to NULL/TRUE/FALSE (aaron).
  * Documentation changes (aaron).
  * Initial development of Media (arthur).
- * Added (perhaps temporary) dependency on tabs module (jody).
- * Made media mover code load only if media mover module_exists. (jody)
