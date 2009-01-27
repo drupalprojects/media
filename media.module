@@ -520,7 +520,7 @@ function media_build_browser($registration_ids, $node_type, $field, $uid) {
       $my_files_elements[$tab_name][$drawer_id] = array(
         '#type' => 'markup',
         '#value' => '',
-        '#prefix' => '<div class="media browser display '. ($first ? 'first': '') .'" id="'. $drawer_id .'"><a name="'. $drawer_id .'"/>',
+        '#prefix' => '<div class="media browser display '. ($first ? 'first': '') .'" id="'. $drawer_id .'"><a name="'. $drawer_id .'"></a>',
         '#suffix' => '</div>',
         'resource_form' => $form,
       );
