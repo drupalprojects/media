@@ -34,12 +34,11 @@ function media_menu() {
     'file' => 'media_ahah.inc',
   );
 
-  // media configuration per content type
+  // media configuration
   $items['admin/content/media'] = array(
     'title' => 'Media',
     'description' => 'Configure your site\'s Media settings.',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('media_admin_settings'),
+    'page callback' => 'media_admin_settings',
     'access arguments' => array('administer media'),
     'file' => 'media_admin.inc',
   );

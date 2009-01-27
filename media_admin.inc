@@ -13,30 +13,21 @@
  *
  * @return unknown
  */
-function media_admin_settings($form, $type_name = null) {
-  $form = array();
-
+function media_admin_settings($form = array(), $type_name = null) {
   // Default page - no content type selected.
   if (!$type_name) {
-    $form['admin'] = array(
-      '#value' => t('Media module settings'),
-    );
     // get all the content types
     $types = node_get_types();
+    $content_types = array();
     if ($types) {
-      $content_types = array();
       foreach ($types as $content_type) {
         $content_types[] = l($content_type->name, 'admin/content/media/'. $content_type->type);
       }
-      $form['types'] = array(
-        '#value' => theme('item_list', $content_types),
-      );
     }
-    return system_settings_form($form);
+    return theme('item_list', $content_types, t('Media module settings'));
   }
 
   // Specific content type settings.
-
   // Do we have cck installed?
   if (module_exists('content')) {
     $type = content_types($type_name);
