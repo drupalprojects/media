@@ -4,5 +4,8 @@ Changelog for the Resource module.
 
 January 2009
 ------------
+ * Change require to include (aaron).
+ * Look in hook_exit to see if path has changed (aaron).
+ * Save module path to variable, as no access to drupal_get_path (aaron).
  * Initial backport to d6 (aaron).
  * Initial development (dopry).

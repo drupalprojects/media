@@ -36,6 +36,7 @@
 function resource_boot() {
   // We don't have drupal_get_path at this time.
   $path = variable_get('resource_path', '');
+  print('path: '. $path);
   require_once($path .'/ResourceStreamWrapperManager.inc');
   require_once($path .'/ResourceStreamWrapper.inc');
   require_once($path .'/ResourcePublicStreamWrapper.inc');
@@ -56,6 +57,7 @@ function resource_exit() {
   // If we've moved our module, then make sure we know that on the next page load.
   if (variable_get('resource_path', '') != drupal_get_path('module', 'resource')) {
     variable_set('resource_path', drupal_get_path('module', 'resource'));
+    drupal_set_message('changed module path');
   }
 }
 
