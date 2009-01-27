@@ -69,7 +69,7 @@ function media_menu() {
  * @param $form_id
  *
  */
-function media_form_alter (&$form, $form_state, $form_id) {
+function media_form_alter(&$form, $form_state, $form_id) {
   global $user;
 
   // Add the media browser on the node add/edit screen.
@@ -415,21 +415,46 @@ function media_get_resources($registration_ids, $node_type, $field, $uid) {
 /**
  * Get a list of fields for the requested node type.
  *
- * @param string $type
+ * @param string $type_name
  *   Drupal {node} type.
  * @param string $function
  *   Either 'resource' or 'formatter'.
  * @return array
  *   An array of field names.
  */
-function media_active_fields_for_node_type($type, $function = 'resource') {
-  $items = variable_get('media_'. $type .'_'. $function, array());
+function media_active_fields_for_node_type($type_name, $function = 'resource') {
+  //@TODO: Some of this code is redundant with media_admin_settings
+  if (module_exists('content')) {
+    $type = content_types($type_name);
+  }
+  else {
+    // Get the specific content type.
+    $type = (array) node_get_types('type', $type_name);
+  }
+  // Add the upload form as a type of faux field.
+  if (is_array($type['extra']['attachments'])) {
+    $type['fields']['attachments'] = array(
+      'field_name' => 'attachments',
+      'type' => 'attachments',
+      'widget' => array(
+        'label' => $type['extra']['attachments']['label'],
+      ),
+    );
+  }
+  $items = array();  
+  // extract the fields for this node type
+  foreach ((array)$type['fields'] as $field_name => $field) {
+    $items[] = variable_get('media_'. $type_name .'_'. $field['field_name'] .'_'. $function, array());
+  }
+  
   $data = array();
-  foreach ($items as $id => $item) {
-    // we need to split the $id into $field_name and $media registration id
-    if ($item) {
-      $id = explode('--', $id);
-      $data[$id[0]][] = $id[1];
+  foreach ($items as $item) {
+    foreach ($item as $id => $value) {
+      // we need to split the $id into $field_name and $media registration id
+      if ($value) {
+        $id = explode('--', $id);
+        $data[$id[0]][] = $id[1];
+      }
     }    
   }
   return $data;
