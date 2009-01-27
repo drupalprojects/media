@@ -26,7 +26,7 @@ function media_admin_settings($form = array(), $type_name = null) {
     }
     return theme('item_list', $content_types, t('Media module settings'));
   }
-
+  $form = array();
   // Specific content type settings.
   // Do we have cck installed?
   if (module_exists('content')) {
@@ -44,17 +44,26 @@ function media_admin_settings($form = array(), $type_name = null) {
     '#description' => t('Enable the Media resource browser for this node type.'),
     '#default_value' => variable_get('media_'. $type_name .'_enabled', null),
   );
-
+  
+  // Add the upload form as a type of faux field.
+  if (is_array($type['extra']['attachments'])) {
+    $type['fields']['attachments'] = array(
+      'field_name' => 'attachments',
+      'type' => 'attachments',
+      'widget' => array(
+        'label' => $type['extra']['attachments']['label'],
+      ),
+    );
+  }
+    
   // extract the fields for this node type
   foreach ((array)$type['fields'] as $field_name => $field) {
-
     // create the field identifier
     $form[$field['field_name']] = array(
       '#type' => 'fieldset',
       '#title' => t('Field name: !name', array('!name' => $field['widget']['label'])),
       '#collapsible' => 'true',
     );
-
     // build a form for each type of module that we have
     foreach (media_registration_kinds() as $kind) {
       // get all the kinds that match this field
@@ -63,12 +72,12 @@ function media_admin_settings($form = array(), $type_name = null) {
         foreach ($registrations as $id => $registration) {
           $options[$field['field_name'] .'--'. $id] = $registration['name'] .': '. $registration['description'];
         }
-        $form[$field['field_name']]['media_'. $type_name .'_'. $kind] = array(
+        $form[$field['field_name']]['media_'. $type_name .'_'. $field['field_name'] .'_'. $kind] = array(
           '#title' => t('Enable !kind options for this field', array('!kind' => $kind)),
           '#description' => t('Choose which !kind options you would like to have enabled on this field', array('!kind' => $kind)),
           '#type' => 'checkboxes',
           '#options' => $options,
-          '#default_value' => variable_get('media_'. $type_name .'_'. $kind, array()),
+          '#default_value' => variable_get('media_'. $type_name .'_'. $field['field_name'] .'_'. $kind, array()),
         );
       }
     }

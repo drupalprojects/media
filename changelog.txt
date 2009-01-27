@@ -2,6 +2,7 @@
 
 January 2009
 ------------
+ * Created settings for the core upload file and fixed settings form name collisions. (jody)
  * Removed system_settings_form from main media admin page which has no settings yet. (jody)
  * Fixed broken logic in media_active_fields_for_node_type. (jody)
  * Made media mover code load only if media mover module_exists. (jody)
