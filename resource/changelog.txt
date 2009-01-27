@@ -4,6 +4,7 @@ Changelog for the Resource module.
 
 January 2009
 ------------
+ * Port ResourceStreamWrapper.inc and ResourceStreamWrapperManager.inc from HEAD (aaron).
  * Change require to include (aaron).
  * Look in hook_exit to see if path has changed (aaron).
  * Save module path to variable, as no access to drupal_get_path (aaron).
