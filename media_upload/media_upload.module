@@ -2,7 +2,6 @@
 
 // $Id$
 
-
 /**
  * @file 
  * This module provides integration for Drupal's upload module
@@ -60,7 +59,10 @@ function media_upload_media_register() {
       'description' => t('Provides integration with Drupal\'s Upload module'),
       'fields' => array('attachments', 'filefield'),
     ),
-    'media_mover' => array(
+  );
+  // @TODO: remove media_mover related code
+  if (module_exists('media_mover')) {
+    $registration['media_mover'] = array(
       // human readable name
       'name' => t('Media Mover files'),
       'uri' => 'file',
@@ -73,8 +75,8 @@ function media_upload_media_register() {
        // human readable description
       'description' => t('Provides integration with Media Mover'),
       'fields' => array('attachments', 'filefield'),
-    ),
-  );
+    );
+  }
   return $registration;
 }
 
