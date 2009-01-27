@@ -2,6 +2,7 @@
 
 January 2009
 ------------
+ * Fixed broken logic in media_active_fields_for_node_type. (jody)
  * Made media mover code load only if media mover module_exists. (jody)
  * Added (perhaps temporary) dependency on tabs module (jody).
  * #description sp. (aaron).

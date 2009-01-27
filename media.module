@@ -428,8 +428,10 @@ function media_active_fields_for_node_type($type, $function = 'resource') {
   $data = array();
   foreach ($items as $id => $item) {
     // we need to split the $id into $field_name and $media registration id
-    $item = explode('--', $id);
-    $data[$item[0]][] = $item[1];
+    if ($item) {
+      $id = explode('--', $id);
+      $data[$id[0]][] = $id[1];
+    }    
   }
   return $data;
 }
