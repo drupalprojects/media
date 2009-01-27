@@ -3,7 +3,7 @@
 // $Id$
 
 /**
- * @info 
+ * @info
  * This file provides all the theming functions for the Media module
  */
 
@@ -14,7 +14,7 @@
  * @return string
  *   formated html
  */
-function theme_media_no_tabs_display ($tabs) {  
+function theme_media_no_tabs_display ($tabs) {
   return "it would be a good idea to install tabs, huh.";
 }
 
@@ -28,8 +28,8 @@ function theme_media_no_tabs_display ($tabs) {
 function theme_media_file_browser($element) {
   // add the CSS for our display
   $output = '<div class="media browser">'. $element .'</div>';
-  
-  
-  
+
+
+
   return $output;
 }

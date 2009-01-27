@@ -28,3 +28,9 @@ CONFIGURATION
 DEVELOPERS
 -------------------------------------------------------
 We are documenting the API as we go. Please see: http://drupal.org/node/356803
+
+@TODO
+-------------------------------------------------------
+ * Currently requires the Tabs module. Either remove the dependency, or add
+   that to the dependencies[] in the .info file.
+ * Remove apparant dependency of media mover.

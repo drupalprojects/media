@@ -19,23 +19,23 @@
 function media_ahah_formatter_load($registration_id, $node_type, $field) {
   // Get the cache form data
   $form = form_get_cache($_POST['form_build_id'], &$cached_form_state);
-  // 
-  
+  //
+
   //return drupal_json(''
-  
+
   //eturn drupal_json('<pre>'. print_r($_POST, true) .'</pre><pre>'.print_r($form, true) .'</pre>');
-  
+
   media_ahah_debug($_POST);
-  
+
   exit();
-  
-  
+
+
   global $user;
-  
- 
+
+
   // get the file creator for this item
   $file_creator = media_get_registered_modules(array($stream_id));
-  
+
   // get the formaters for this node type
   $formatters = media_active_fields_for_node_type($node_type, 'formatter');
   // get the registrations
@@ -44,7 +44,7 @@ function media_ahah_formatter_load($registration_id, $node_type, $field) {
 
   // remove any non-applying registrations
   $registrations = media_get_applicable_formatters($registrations, $file_extension);
-  
+
   // get all the formatting forms
   $formatter_options = array();
   $forms = array();
@@ -53,17 +53,17 @@ function media_ahah_formatter_load($registration_id, $node_type, $field) {
     $function = $registration['callbacks']['form'];
     if (function_exists($function)) {
       $forms[$id] = $function($node_type, $field, $file_extension);
-    }    
+    }
   }
   return drupal_json(drupal_get_form('media_formater_ahah_form', $formatter_options, $forms)); //, $forms)); //, $formatter_options, $forms));
 }
 
 
 function media_ahah_debug($array) {
-  
+
   drupal_json('<pre>'. print_r($array, true) .'</pre>');
   exit();
-  
+
 }
 
 
@@ -81,9 +81,9 @@ function media_formater_ahah_form($form_state, $options, $forms) {
     '#type' => 'fieldset',
     '#title' => t('Format options'),
   );
-  
+
   // if we only have one option, display that
-  if (count($options) > 1) { 
+  if (count($options) > 1) {
     $form['formatter']['formatter_select'] = array(
       '#type' => 'select',
       '#title' => t('Select the formater to use'),
@@ -93,7 +93,7 @@ function media_formater_ahah_form($form_state, $options, $forms) {
   $form['formatter'][] = $forms;
   $form['formatter']['submit'] = array(
     '#type' => 'submit',
-    '#value' => 'format'  
-  );  
+    '#value' => 'format'
+  );
   return $form;
 }

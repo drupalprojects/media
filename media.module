@@ -149,10 +149,10 @@ function media_get_registered_modules($ids = NULL, $reset = FALSE) {
       // Add the module name to each registration.
       foreach (array_keys($function()) as $key) {
         $registration[$key]['module'] = $module;
-        if (! $registraton[$key]['uri']) {
+        if (!$registraton[$key]['uri']) {
           $registration[$key]['uri'] = MEDIA_RESOURCE_URI_DEFAULT;
         }
-        if (! $registration[$key]['types']) {
+        if (!$registration[$key]['types']) {
           $registration[$key]['types'] = MEDIA_TYPES_DEFAULT;
         }
       }
@@ -399,21 +399,21 @@ function media_registration_data($name) {
  * @return array
  */
 function media_get_resources($registration_ids, $node_type, $field, $uid) {
-  // get all the registrations that define the resources
+  // Get all the registrations that define the resources.
   $registrations = media_get_registered_modules($registration_ids);
   foreach ($registrations as $id => $registration) {
-    // get the callback function
+    // Get the callback function.
     $function = $registration['callbacks']['resource'];
     if (function_exists($function)) {
-      // get the results of the callback function
+      // Get the results of the callback function.
       $item = $function($node_type, $field, $uid);
       $tab_name = key($item);
-      // add a resource_id to the item
+      // Add a resource_id to the item.
       $item[$tab_name][key($item[$tab_name])]['resource_id'] = array(
         '#type' => 'value',
         '#value' => $id,
       );
-      // add tabs under the tab name
+      // Add tabs under the tab name.
       $items[$tab_name][key($item[$tab_name])] = $item[$tab_name][key($item[$tab_name])];
     }
   }
