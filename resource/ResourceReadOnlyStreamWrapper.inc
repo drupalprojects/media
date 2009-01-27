@@ -113,25 +113,30 @@ abstract class ResourceReadOnlyStreamWrapper implements ResourceReadOnlyStreamWr
   }
 
   /**
-   *  Returns an array of any parameters stored in the URL's query.
+   *  Returns an array of any parameters stored in the URL's path.
    *  @param $url
-   *    The URL to parse, such as youtube://?code=[code].
+   *    The URL to parse, such as youtube://v/[video-code]/t/[tags+more-tags].
    *  @return
-   *    An associative array of all the parameters in the query,
+   *    An associative array of all the parameters in the path,
    *    or FALSE if the $url is ill-formed.
    */
   private function _parse_url($url) {
-    $query = parse_url($url, PHP_URL_QUERY);
-    if ($query === FALSE) {
+    $path = parse_url($url, PHP_URL_PATH);
+    if ($path === FALSE) {
+      // Non-recoverable error when parsing the path.
       return FALSE;
     }
-    $parts = explode('&', $query);
+    $parts = explode('/', $path);
     $params = array();
-    foreach ($parts as $part) {
-      $param = explode('=', $part);
-      if (count($param) == 2) {
-        $params[$param[0]] = $param[1];
-      }
+    $count = 0;
+    $total = count($parts);
+    if (!$total || ($total % 2)) {
+      // If we have no parts, or an odd number of parts, it's malformed.
+      return FALSE;
+    }
+    while ($count < $total) {
+      // We iterate count for each step of the assignment to keep us honest.
+      $params[$parts[$count++]] = $parts[$count++];
     }
     return $params;
   }
