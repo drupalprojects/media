@@ -163,7 +163,8 @@ abstract class ResourceReadOnlyStreamWrapper implements ResourceReadOnlyStreamWr
       return $this->_report_error('Attempted to open %url as mode: @mode.', array('%url' => $url, '%mode' => $mode), ($options & STREAM_REPORT_ERRORS));
     }
 
-    // We parse youtube://?code=dsyiufo34 to store the video code in our private variable.
+    // We parse a URL as youtube://v/dsyiufo34/t/cats+dogs to store
+    // the relevant code(s) in our private array of parameters.
     $this->parameters = $this->_parse_url($url);
 
     if ($this->parameters === FALSE) {
