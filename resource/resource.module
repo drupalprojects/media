@@ -40,6 +40,7 @@ function resource_boot() {
   include_once($path .'/ResourceStreamWrapper.inc');
   include_once($path .'/ResourcePublicStreamWrapper.inc');
   include_once($path .'/ResourcePrivateStreamWrapper.inc');
+  include_once($path .'/ResourceReadOnlyStreamWrapper.inc');
 /*  module_load_include('inc', 'resource', 'ResourceStreamWrapperManager');
   module_load_include('inc', 'resource', 'ResourceStreamWrapper');
   module_load_include('inc', 'resource', 'ResourcePublicStreamWrapper');
