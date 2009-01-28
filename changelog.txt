@@ -2,6 +2,8 @@
 
 January 2009
 ------------
+ * Add variable_get('media_file_list_size', 10) (aaron).
+ * Add experimental hook_elements and relevant themes (aaron).
  * Changed media_active_fields_for_node_type to handle multiple fields per type. (jody)
  * Created settings for the core upload file and fixed settings form name collisions. (jody)
  * Removed system_settings_form from main media admin page which has no settings yet. (jody)

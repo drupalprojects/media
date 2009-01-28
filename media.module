@@ -97,7 +97,11 @@ function media_theme() {
     'media_file_browser' => array(
       'file' => 'media_theme.inc',
       'arguments' => array('element' => NULL),
-    )
+    ),
+    'media_file_list' => array(
+      'file' => 'media_theme.inc',
+      'arguments' => array('element' => NULL),
+    ),
   );
 }
 
@@ -441,12 +445,12 @@ function media_active_fields_for_node_type($type_name, $function = 'resource') {
       ),
     );
   }
-  $items = array();  
+  $items = array();
   // extract the fields for this node type
   foreach ((array)$type['fields'] as $field_name => $field) {
     $items[] = variable_get('media_'. $type_name .'_'. $field['field_name'] .'_'. $function, array());
   }
-  
+
   $data = array();
   foreach ($items as $item) {
     foreach ($item as $id => $value) {
@@ -455,7 +459,7 @@ function media_active_fields_for_node_type($type_name, $function = 'resource') {
         $id = explode('--', $id);
         $data[$id[0]][] = $id[1];
       }
-    }    
+    }
   }
   return $data;
 }
@@ -592,8 +596,8 @@ function media_resource_display_user_files_form($files, $title = NULL) {
     '#type' => 'select',
     '#options' => $options,
     '#title' => $title ? $title : '',
-    '#size' => 10,
     '#attributes' => array('class' => 'resource select'),
+    '#size' => variable_get('media_file_list_size', 10),
   );
   return $form;
 }
@@ -670,3 +674,52 @@ function media_display_user_files($node_type, $field, $uid) {
   );
   return $return;
 }
+
+/**
+ *  Implementation of hook_elements().
+ *  A Media File List element is created with the following FAPI:
+ *    '#type' => 'media_file_list',
+ *    '#default_value' => $fid,       // A valid File ID, or NULL.
+ *    '#options' => $options,         // An associative array of filepaths, keyed by FID.
+ *    '#title' => $title,             // The translated title, displayed in the tab.
+ *    '#description' => $description, // A translated description, to be displayed below the title.
+ */
+function media_elements() {
+  $elements = array();
+  $elements['media_file_list'] = array(
+    '#input' => TRUE,
+    '#process' => array('media_file_list_element_process'),
+    '#element_validate' => array('media_file_list_element_validate'),
+    '#submit' => array('media_file_list_element_submit'),
+  );
+  return $elements;
+}
+
+/**
+ *  Process callback for the media_browser element.
+ */
+function media_file_list_element_process($element, $edit, $form_state, $form) {
+  $element['list'] = array(
+    '#type' => 'select',
+    '#options' => $element['#options'],
+    '#size' => variable_get('media_file_list_size', 10),
+    '#default_value' => $element['#default_value'],
+  );
+  return $element;
+}
+
+/**
+ * Submit callback for the media_browser element.
+ */
+function media_file_list_element_submit($form, $form_state) {
+  drupal_set_message('Successful submit of the Media File List...');
+}
+
+/**
+ * Validate callback for media_browser element.
+ */
+function media_file_list_element_validate($element, $form_state) {
+  drupal_set_message('Successful validation of the Media File List...');
+  return $element;
+}
+
