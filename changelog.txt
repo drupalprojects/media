@@ -2,6 +2,7 @@
 
 January 2009
 ------------
+ * Add $default_files to form elements (aaron).
  * Add variable_get('media_file_list_size', 10) (aaron).
  * Add experimental hook_elements and relevant themes (aaron).
  * Changed media_active_fields_for_node_type to handle multiple fields per type. (jody)

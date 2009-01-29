@@ -79,7 +79,14 @@ function media_form_alter(&$form, $form_state, $form_id) {
       // Get the fields we need to enable on this module.
       $fields = media_active_fields_for_node_type($form['type']['#value']);
       foreach ($fields as $field => $registration_ids) {
-        $form[$field]['media'] = media_build_browser($registration_ids, $form['type']['#value'], $field, $user->uid);
+        // @TODO: Allow each field to define its default files.
+        if ($field == 'attachments') {
+          $default_files = $form['#node']->files;
+        }
+        else {
+          $default_files = array();
+        }
+        $form[$field]['media'] = media_build_browser($registration_ids, $form['type']['#value'], $field, $user->uid, $default_files);
         $form[$field][0]['#attributes'] = array('class' => 'media replace');
       }
     }
@@ -107,7 +114,7 @@ function media_theme() {
 
 
 /* ***************************************** */
-/* media hook calls                          */
+/* Media hook calls                          */
 /* ***************************************** */
 
 /**
@@ -391,9 +398,11 @@ function media_registration_data($name) {
  *   CCK field name.
  * @param int $uid
  *   Drupal {user} id.
+ *  @param array $default_files
+ *    The default or existing files for this field.
  * @return array
  */
-function media_get_resources($registration_ids, $node_type, $field, $uid) {
+function media_get_resources($registration_ids, $node_type, $field, $uid, $default_files = array()) {
   // Get all the registrations that define the resources.
   $registrations = media_get_registered_modules($registration_ids);
   foreach ($registrations as $id => $registration) {
@@ -401,7 +410,7 @@ function media_get_resources($registration_ids, $node_type, $field, $uid) {
     $function = $registration['callbacks']['resource'];
     if (function_exists($function)) {
       // Get the results of the callback function.
-      $item = $function($node_type, $field, $uid);
+      $item = $function($node_type, $field, $uid, $default_files);
       $tab_name = key($item);
       // Add a resource_id to the item.
       $item[$tab_name][key($item[$tab_name])]['resource_id'] = array(
@@ -487,15 +496,17 @@ function media_create_id($drawer_name) {
  * @param string $node_type
  * @param string $field
  * @param uid $uid
+ * @param array $default_files
+ *    The existing or default file objects for the field.
  * @return array
  *   Drupal FAPI form array.
  */
-function media_build_browser($registration_ids, $node_type, $field, $uid) {
+function media_build_browser($registration_ids, $node_type, $field, $uid, $default_files = array()) {
   $items = array();
   $form = array();
 
   // Get all the resources arrays from the registration ids.
-  $resources = media_get_resources($registration_ids, $node_type, $field, $uid);
+  $resources = media_get_resources($registration_ids, $node_type, $field, $uid, $default_files);
   // Now we order modules into tabs structure.
   // @TODO clean this crap up!
   // Split the tabs into sets of drawers.
@@ -583,21 +594,29 @@ function media_tabs_form($forms) {
  *   array of (uri => uri, filename => filename, meta => array(key => value))
  * @param string $title
  *   option title argument
+ * @param array $default_files
+ *    An array of default file objects.
  * @return string
  */
-function media_resource_display_user_files_form($files, $title = NULL) {
+function media_resource_display_user_files_form($files, $title = NULL, $default_files = array()) {
   // Pass files into options array.
-  $options = array();
+  $options = $defaults = array();
   foreach ($files as $file) {
     $options[$file['uri']] = $file['filename'];
   }
+  foreach ($default_files as $file) {
+    $defaults[] = $file->filepath;
+  }
   // Parse files into form element.
+  // @TODO: #multiple depends on the field.
   $form['media_files'] = array(
     '#type' => 'select',
     '#options' => $options,
     '#title' => $title ? $title : '',
     '#attributes' => array('class' => 'resource select'),
     '#size' => variable_get('media_file_list_size', 10),
+    '#default_value' => $defaults,
+    '#multiple' => TRUE,
   );
   return $form;
 }
@@ -656,8 +675,10 @@ function media_media_register() {
  * @param string $node_type
  * @param string $field
  * @param int $uid
+ * @param array $default_files
+ *  If provided, then this is an array with the default or existing file objects for this field.
  */
-function media_display_user_files($node_type, $field, $uid) {
+function media_display_user_files($node_type, $field, $uid, $default_files = array()) {
   $files = array();
   $results = db_query('SELECT filepath, filename FROM {files} WHERE uid = %d', $uid);
   while ($file = db_fetch_array($results)) {
@@ -669,7 +690,7 @@ function media_display_user_files($node_type, $field, $uid) {
   }
   $return = array(
     t('My files') => array(
-      t('Local') => media_resource_display_user_files_form($files, t('Your files')),
+      t('Local') => media_resource_display_user_files_form($files, t('Your files'), $default_files),
     )
   );
   return $return;
@@ -704,6 +725,7 @@ function media_file_list_element_process($element, $edit, $form_state, $form) {
     '#options' => $element['#options'],
     '#size' => variable_get('media_file_list_size', 10),
     '#default_value' => $element['#default_value'],
+    '#multiple' => TRUE,
   );
   return $element;
 }

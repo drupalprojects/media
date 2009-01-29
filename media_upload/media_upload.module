@@ -3,15 +3,15 @@
 // $Id$
 
 /**
- * @file 
+ * @file
  * This module provides integration for Drupal's upload module
- * with the remig module
+ * with the Media module
  */
 
 
  /**
   * Implementation of hook_media_register
-  * @return 
+  * @return
   *   array
   */
 function media_upload_media_register() {
@@ -19,10 +19,10 @@ function media_upload_media_register() {
     'media_upload_resource' => array(
       // human readable name
       'name' => t('Media Upload resource'),
-      'kind' => 'resource', 
+      'kind' => 'resource',
       'types' => '*',
       'description' => t('Drupal uploaded files'),
-      // function to invoke when data is needed from this 
+      // function to invoke when data is needed from this
       'callbacks' => array(
         'resource' => 'media_upload_media_user_files_select',
       ),
@@ -31,16 +31,16 @@ function media_upload_media_register() {
       // cck field types that this works on
       'fields' => array('attachments', 'filefield'),
     ),
-    
+
     'media_upload_display' => array(
       // human readable name
       'name' => t('Media Drupal Upload display FORMATTER'),
       'kind' => 'formatter',
       'callbacks' => array(
         'form' => 'media_upload_formatter_form',
-      ),     
+      ),
       'types' => '*',
-      'description' => t('Format Drupal uploaded files'),       
+      'description' => t('Format Drupal uploaded files'),
       // human readable description
       'description' => t('Provides integration with Drupal\'s Upload module'),
       'fields' => array('attachments', 'filefield'),
@@ -52,9 +52,9 @@ function media_upload_media_register() {
       'kind' => 'resource',
       'types' => '*',
       'description' => t('Format Drupal uploaded files'),
-      'callbacks' => array( 
+      'callbacks' => array(
         'resource' => 'media_upload_media_user_files_select2',
-       ),      
+       ),
        // human readable description
       'description' => t('Provides integration with Drupal\'s Upload module'),
       'fields' => array('attachments', 'filefield'),
@@ -69,9 +69,9 @@ function media_upload_media_register() {
       'kind' => 'resource',
       'types' => '*',
       'description' => t('Integrate Media Mover files'),
-      'callbacks' => array( 
+      'callbacks' => array(
         'resource' => 'media_upload_media_mover_resource',
-       ),      
+       ),
        // human readable description
       'description' => t('Provides integration with Media Mover'),
       'fields' => array('attachments', 'filefield'),
@@ -86,7 +86,7 @@ function media_upload_formatter_form($node_type, $field, $uri) {
     '#options' => array(1 => 1  ,2 =>2  ,3 => 3 ,4 => 4),
     '#title' => 'formater ahah',
   );
-  
+
   return $form;
 }
 
@@ -127,9 +127,9 @@ function media_upload_media_user_files_select2($node_type, $field, $uid) {
 
 
 /**
- * Display the upload form for the tab 
+ * Display the upload form for the tab
  * @return string
- */ 
+ */
 function media_upload_display_embed_form() {
   $form['media_upload']['upload'] = array(
     '#type' => 'textarea',
@@ -155,10 +155,10 @@ function media_upload_media_mover_resource($node_type, $field, $uid) {
       'filename' => basename($file['complete_file']),
       'meta' => '',
     );
-  }  
-  return array( 
+  }
+  return array(
     t('My files') => array(
-      t('Media Mover') => media_resource_display_upload_form($files, t('Your Media Mover files')),     
+      t('Media Mover') => media_resource_display_upload_form($files, t('Your Media Mover files')),
     )
   );
 }
