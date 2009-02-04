@@ -1,5 +1,9 @@
 // $Id$
 
+February 2009
+-------------
+ * Roll back $default_files (aaron).
+
 January 2009
 ------------
  * Add $default_files to form elements (aaron).
