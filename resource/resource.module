@@ -64,12 +64,7 @@ function resource_exit() {
  *  Implements hook_perm().
  */
 function resource_perm() {
-  return array(
-    'administer resources' => array(
-      'title' => 'Administer resources',
-      'Description' => 'Administer settings for resources and stream handlers.'
-    ),
-  );
+  return array('administer resources');
 }
 
 /**

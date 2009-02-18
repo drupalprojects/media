@@ -2,6 +2,10 @@
 
 Changelog for the Resource module.
 
+February 2009
+-------------
+ * #375876/kwinters D6 Permissions Fix for Resource Module (kwinters).
+
 January 2009
 ------------
  * Store paths as /v/[video-code]/t/[tags+more] for ResourceReadOnlyStreamWrapper.inc (aaron).
