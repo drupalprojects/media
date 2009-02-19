@@ -2,6 +2,7 @@
 
 February 2009
 -------------
+ * Link to file in media upload when displaying formatter (aaron).
  * Capitalization (aaron).
  * Media upload formatters default (aaron).
  * Use PATHINFO_EXTENSION (aaron).

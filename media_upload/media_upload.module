@@ -81,6 +81,10 @@ function media_upload_media_register() {
 }
 
 function media_upload_formatter_form($node_type, $field, $file_extension, $uri) {
+  $form['display'] = array(
+    '#type' => 'item',
+    '#value' => l(url($uri, array('absolute' => TRUE)), $uri),
+  );
   $form['test_stuff'] = array(
     '#type' => 'select',
     '#options' => array(0 => t('Hide file'), 1 => t('List file')),
