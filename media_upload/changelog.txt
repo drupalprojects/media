@@ -1,0 +1,9 @@
+// $Id$
+
+/** Changelog for media_upload.module **/
+
+February 2009
+-------------
+ * Link to file in media upload when displaying formatter (aaron).
+ * Media upload formatters default (aaron).
+ * media_upload_formatter_form($node_type, $field, $file_extension, $uri) (aaron).
