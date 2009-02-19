@@ -2,30 +2,26 @@
 // $Id$
 
 /**
- * This function builds the form elements for the file formater based
- * on the node type and field for settings and the file extension to get the formaters
- * @param string $registration_id
- *   the id of the registration creating this formatter
- * @param string $node_type
- *   the kind of node
- * @param string $field
- *   the machine name of the field being operated on
- * @param string $uri
- *   the uri to the item, or file://path if it is being uploaded
- * @param string $file_extension
- *   the kind of file that will be operated on
+ *  This function builds the form elements for the file formater based
+ *  on the node type and field for settings and the file extension to get the
+ *  formatters.
+ *  @param string $registration_id
+ *    The id of the registration creating this formatter.
+ *  @param string $node_type
+ *    The kind of node.
+ *  @param string $field
+ *    The machine name of the field being operated on.
+ *  @param string $uri
+ *    (optional) The uri to the item, or file://path if it is being uploaded.
+ *  @param string $file_extension
+ *    (optional) The kind of file that will be operated on.
  */
-function media_ahah_formatter_load($registration_id, $node_type, $field) {
+function media_ahah_formatter_load($registration_id, $node_type, $field, $uri = NULL, $file_extension = NULL) {
   // Get the cache form data.
   $form = form_get_cache($_POST['form_build_id'], &$cached_form_state);
 
-  $uri = $_POST['media_files'];
-
-  $path_info = pathinfo($uri);
-  $file_extension = $path_info['extension'];
-
-  global $user;
-
+  $uri = isset($uri) ? $uri : $_POST['media_files'];
+  $file_extension = isset($file_extension) ? $file_extension : pathinfo($uri, PATHINFO_EXTENSION);
 
   // Get the file creator for this item.
   $file_creator = media_get_registered_modules(array($registration_id));
@@ -39,7 +35,7 @@ function media_ahah_formatter_load($registration_id, $node_type, $field) {
   // Remove any non-applying registrations.
   $registrations = media_get_applicable_formatters($registrations, $file_extension);
 
-  // get all the formatting forms
+  // Get all the formatting forms.
   $formatter_options = array();
   $forms = array();
   foreach ($registrations as $id => $registration) {
@@ -49,8 +45,8 @@ function media_ahah_formatter_load($registration_id, $node_type, $field) {
       $forms[$id] = $function($node_type, $field, $file_extension, $uri);
     }
   }
-  media_ahah_debug($registrations);
-  return drupal_json(drupal_get_form('media_formater_ahah_form', $formatter_options, $forms)); //, $forms)); //, $formatter_options, $forms));
+//   media_ahah_debug($forms);
+  return drupal_json(drupal_get_form('media_formater_ahah_form', $formatter_options, $forms));
 }
 
 
@@ -63,13 +59,13 @@ function media_ahah_debug($array) {
 
 
 /**
- * AHAH form displayed under the file selector
+ *  AHAH form displayed under the file selector.
  *
- * @param array $form_state
- * @param array $options
- * @param array $forms
- * @return array
- *   drupal form array
+ *  @param array $form_state
+ *  @param array $options
+ *  @param array $forms
+ *  @return array
+ *    drupal form array
  */
 function media_formater_ahah_form($form_state, $options, $forms) {
   $form['formatter'] = array(
@@ -77,7 +73,7 @@ function media_formater_ahah_form($form_state, $options, $forms) {
     '#title' => t('Format options'),
   );
 
-  // if we only have one option, display that
+  // If we only have one option, display that.
   if (count($options) > 1) {
     $form['formatter']['formatter_select'] = array(
       '#type' => 'select',

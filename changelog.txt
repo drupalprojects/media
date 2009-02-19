@@ -2,6 +2,7 @@
 
 February 2009
 -------------
+ * Use PATHINFO_EXTENSION (aaron).
  * $formatter in media_get_applicable_formatters (aaron).
  * $uri and $file_extension in ahah (aaron).
  * media_upload_formatter_form($node_type, $field, $file_extension, $uri) (aaron).
