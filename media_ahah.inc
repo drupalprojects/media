@@ -25,16 +25,16 @@ function media_ahah_formatter_load($registration_id, $node_type, $field) {
 
   //eturn drupal_json('<pre>'. print_r($_POST, true) .'</pre><pre>'.print_r($form, true) .'</pre>');
 
-  media_ahah_debug($_POST);
-
-  exit();
+//   media_ahah_debug($_POST);
+//
+//   exit();
 
 
   global $user;
 
 
   // get the file creator for this item
-  $file_creator = media_get_registered_modules(array($stream_id));
+  $file_creator = media_get_registered_modules(array($registration_id));
 
   // get the formaters for this node type
   $formatters = media_active_fields_for_node_type($node_type, 'formatter');
@@ -55,6 +55,9 @@ function media_ahah_formatter_load($registration_id, $node_type, $field) {
       $forms[$id] = $function($node_type, $field, $file_extension);
     }
   }
+
+  media_ahah_debug($forms);
+
   return drupal_json(drupal_get_form('media_formater_ahah_form', $formatter_options, $forms)); //, $forms)); //, $formatter_options, $forms));
 }
 
