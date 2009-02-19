@@ -83,8 +83,8 @@ function media_upload_media_register() {
 function media_upload_formatter_form($node_type, $field, $file_extension, $uri) {
   $form['test_stuff'] = array(
     '#type' => 'select',
-    '#options' => array(1 => $node_type  ,2 =>$field  ,3 => $file_extension ,4 => $uri),
-    '#title' => 'formater ahah',
+    '#options' => array(0 => t('Hide file'), 1 => t('List file')),
+    '#title' => 'Formater ahah',
   );
 
   return $form;

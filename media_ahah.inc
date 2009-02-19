@@ -45,7 +45,7 @@ function media_ahah_formatter_load($registration_id, $node_type, $field, $uri = 
       $forms[$id] = $function($node_type, $field, $file_extension, $uri);
     }
   }
-//   media_ahah_debug($forms);
+//   media_ahah_debug($formatter_options);
   return drupal_json(drupal_get_form('media_formater_ahah_form', $formatter_options, $forms));
 }
 
