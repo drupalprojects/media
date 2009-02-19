@@ -258,7 +258,7 @@ function media_get_applicable_formatters($registrations, $file_extension) {
   if ($file_extension) {
     foreach ($registrations as $id => $formatter) {
       // Does this formatter use any file type? If not, then we have to dig.
-      if (!$registration['types'] == MEDIA_TYPES_DEFAULT) {
+      if (!$formatter['types'] == MEDIA_TYPES_DEFAULT) {
         // We need to see if this file type is supported specifically.
         if (!in_array($file_extension, $registration['types'])) {
           // This registration is not useful.
