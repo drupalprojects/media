@@ -1,5 +1,4 @@
 <?php
-
 // $Id$
 
 /**
@@ -17,32 +16,27 @@
  *   the kind of file that will be operated on
  */
 function media_ahah_formatter_load($registration_id, $node_type, $field) {
-  // Get the cache form data
+  // Get the cache form data.
   $form = form_get_cache($_POST['form_build_id'], &$cached_form_state);
-  //
 
-  //return drupal_json(''
+  $uri = $_POST['media_files'];
 
-  //eturn drupal_json('<pre>'. print_r($_POST, true) .'</pre><pre>'.print_r($form, true) .'</pre>');
-
-//   media_ahah_debug($_POST);
-//
-//   exit();
-
+  $path_info = pathinfo($uri);
+  $file_extension = $path_info['extension'];
 
   global $user;
 
 
-  // get the file creator for this item
+  // Get the file creator for this item.
   $file_creator = media_get_registered_modules(array($registration_id));
 
-  // get the formaters for this node type
+  // Get the formaters for this node type.
   $formatters = media_active_fields_for_node_type($node_type, 'formatter');
-  // get the registrations
-  //print_r( media_get_registered_modules());
+
+  // Get the registrations.
   $registrations = media_get_registered_modules($formatters[$field]);
 
-  // remove any non-applying registrations
+  // Remove any non-applying registrations.
   $registrations = media_get_applicable_formatters($registrations, $file_extension);
 
   // get all the formatting forms
@@ -52,12 +46,10 @@ function media_ahah_formatter_load($registration_id, $node_type, $field) {
     $formatter_options[$id] = $registration['name'];
     $function = $registration['callbacks']['form'];
     if (function_exists($function)) {
-      $forms[$id] = $function($node_type, $field, $file_extension);
+      $forms[$id] = $function($node_type, $field, $file_extension, $uri);
     }
   }
-
-  media_ahah_debug($forms);
-
+  media_ahah_debug($registrations);
   return drupal_json(drupal_get_form('media_formater_ahah_form', $formatter_options, $forms)); //, $forms)); //, $formatter_options, $forms));
 }
 
