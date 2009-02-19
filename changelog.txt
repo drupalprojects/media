@@ -2,6 +2,7 @@
 
 February 2009
 -------------
+ * Capitalization (aaron).
  * Media upload formatters default (aaron).
  * Use PATHINFO_EXTENSION (aaron).
  * $formatter in media_get_applicable_formatters (aaron).

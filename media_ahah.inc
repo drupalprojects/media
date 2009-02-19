@@ -84,7 +84,7 @@ function media_formater_ahah_form($form_state, $options, $forms) {
   $form['formatter'][] = $forms;
   $form['formatter']['submit'] = array(
     '#type' => 'submit',
-    '#value' => 'format'
+    '#value' => t('Format'),
   );
   return $form;
 }
