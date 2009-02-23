@@ -4,6 +4,7 @@
 
 February 2009
 -------------
+ * Change link formatting (aaron).
  * Change test select to list checkbox (aaron).
  * Link to file in media upload when displaying formatter (aaron).
  * Media upload formatters default (aaron).

@@ -1,5 +1,4 @@
 <?php
-
 // $Id$
 
 /**
@@ -81,15 +80,17 @@ function media_upload_media_register() {
 }
 
 function media_upload_formatter_form($node_type, $field, $file_extension, $uri) {
-  $form['display'] = array(
-    '#type' => 'item',
-    '#value' => l(url($uri, array('absolute' => TRUE)), $uri),
-  );
-  $form['list'] = array(
-    '#type' => 'checkbox',
-    '#title' => 'List file',
-    '#default_value' => TRUE,
-  );
+  if ($uri) {
+    $form['display'] = array(
+      '#type' => 'item',
+      '#value' => l($uri, $uri),
+    );
+    $form['list'] = array(
+      '#type' => 'checkbox',
+      '#title' => 'List file',
+      '#default_value' => TRUE,
+    );
+  }
 
   return $form;
 }

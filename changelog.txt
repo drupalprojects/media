@@ -2,6 +2,7 @@
 
 February 2009
 -------------
+ * Pass URI in ahah submission (aaron).
  * Capitalization (aaron).
  * Use PATHINFO_EXTENSION (aaron).
  * $formatter in media_get_applicable_formatters (aaron).

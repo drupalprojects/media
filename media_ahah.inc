@@ -46,7 +46,7 @@ function media_ahah_formatter_load($registration_id, $node_type, $field, $uri = 
     }
   }
 //   media_ahah_debug($formatter_options);
-  return drupal_json(drupal_get_form('media_formater_ahah_form', $formatter_options, $forms));
+  return drupal_json(drupal_get_form('media_formater_ahah_form', $formatter_options, $forms, $uri));
 }
 
 
@@ -64,10 +64,12 @@ function media_ahah_debug($array) {
  *  @param array $form_state
  *  @param array $options
  *  @param array $forms
+ *  @param string $uri
+ *    The file that's just been selected or uploaded.
  *  @return array
  *    drupal form array
  */
-function media_formater_ahah_form($form_state, $options, $forms) {
+function media_formater_ahah_form($form_state, $options, $forms, $uri) {
   $form['formatter'] = array(
     '#type' => 'fieldset',
     '#title' => t('Format options'),
@@ -82,9 +84,24 @@ function media_formater_ahah_form($form_state, $options, $forms) {
     );
   }
   $form['formatter'][] = $forms;
+
+  // @TODO: Why won't this value stick?
+  // We need to pass this for final submission.
+  $form['uri'] = array(
+    '#type' => 'value',
+    '#value' => $uri,
+  );
+
   $form['formatter']['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Format'),
   );
   return $form;
+}
+
+function media_formater_ahah_form_submit($form, &$form_state) {
+  if (function_exists('dpm')) {
+    dpm($form);
+    dpm($form_state);
+  }
 }
