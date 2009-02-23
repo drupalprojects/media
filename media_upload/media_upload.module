@@ -85,10 +85,10 @@ function media_upload_formatter_form($node_type, $field, $file_extension, $uri) 
     '#type' => 'item',
     '#value' => l(url($uri, array('absolute' => TRUE)), $uri),
   );
-  $form['test_stuff'] = array(
-    '#type' => 'select',
-    '#options' => array(0 => t('Hide file'), 1 => t('List file')),
-    '#title' => 'Formater ahah',
+  $form['list'] = array(
+    '#type' => 'checkbox',
+    '#title' => 'List file',
+    '#default_value' => TRUE,
   );
 
   return $form;
