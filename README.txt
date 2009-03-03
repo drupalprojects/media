@@ -20,9 +20,13 @@ INSTALLATION
 
 CONFIGURATION
 -------------------------------------------------------
- 1. Go to admin > content > media
- 2. Configure settings per content type. Each field in a node can have options
-    for what resources and formatters are available to it.
+ 1. Grant "administer resources" permission to users that will be uploading or 
+    browsing resources
+ 2. Go to admin > content > media > global
+ 3. Global and Default Media Settings, which would normally be enabled everywhere
+    (will only be available for users with the administer resources permission 
+    and in content types with appropriate fields).
+ 4. Configure settings per content type if needed.
 
 
 DEVELOPERS

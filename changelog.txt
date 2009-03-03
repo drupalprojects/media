@@ -1,5 +1,9 @@
 // $Id$
 
+March 2009
+----------
+ * #377050 - Intelligent Media Defaults (kwinters).
+
 February 2009
 -------------
  * Pass URI in ahah submission (aaron).

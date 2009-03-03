@@ -27,14 +27,14 @@ define('MEDIA_TYPES_DEFAULT', '*');
  *
  */
 function media_menu() {
-  // ajax formatter
+  // AJAX formatter
   $items['media/ahah'] = array(
     'page callback' => 'media_ahah_formatter_load',
     'access arguments' => array('access content'),
     'file' => 'media_ahah.inc',
   );
 
-  // media configuration
+  // Media configuration parent path.
   $items['admin/content/media'] = array(
     'title' => 'Media',
     'description' => 'Configure your site\'s Media settings.',
@@ -42,25 +42,46 @@ function media_menu() {
     'access arguments' => array('administer media'),
     'file' => 'media_admin.inc',
   );
-
-  // build pages for each content type
+  
+  // Default settings, for content types that do not have their own.
+  $items['admin/content/media/global'] = array(
+    'title' => 'Global and Default Media Settings',
+    'description' => 'Configure Global Media settings, including default content type settings',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('media_admin_settings','global'),
+    'access arguments' => array('administer media'),
+    'file' => 'media_admin.inc',
+    'weight' => 3,
+  );
+  
+  // Top-level page for content types, split off because it gets crowded.
+  $items['admin/content/media/types'] = array(
+    'title' => 'Content Type Settings',
+    'description' => 'Configure Media settings that are specific to a content type',
+    'page callback' => 'media_admin_settings',
+    'page arguments' => array('media_admin_settings','types'),
+    'access arguments' => array('administer media'),
+    'file' => 'media_admin.inc',
+  );
+  
+  // Build pages for each content type.
   $content_types = node_get_types();
   if ($content_types) {
     foreach ($content_types as $content_type) {
-      $items['admin/content/media/'. $content_type->type] = array(
+      $items['admin/content/media/types/'. $content_type->type] = array(
         'title' => $content_type->name,
         'description' => 'Configure Media settings for '. $content_type->name,
         'page callback' => 'drupal_get_form',
         'page arguments' => array('media_admin_settings', $content_type->type),
         'access arguments' => array('administer media'),
         'file' => 'media_admin.inc',
+        'type' => MENU_CALLBACK,
       );
     }
   }
-
+  
   return $items;
 }
-
 
 /**
  * Implementation of hook_form_alter().
@@ -74,8 +95,14 @@ function media_form_alter(&$form, $form_state, $form_id) {
 
   // Add the media browser on the node add/edit screen.
   if (strstr($form_id, 'node_form') ) {
-    // Is the media browser enabled on this node type?
-    if (variable_get('media_'. $form['type']['#value'] .'_enabled', NULL)) {
+    // Is the media browser enabled on this node type? Type-specific options override the default.
+    if (variable_get('media_'. $form['type']['#value'] .'_override', null)) {
+      $enabled = variable_get('media_'. $form['type']['#value'] .'_enabled', NULL);
+    }
+    else {
+      $enabled = variable_get('media_global_enabled', 1);
+    }
+    if ($enabled) {
       // Get the fields we need to enable on this module.
       $fields = media_active_fields_for_node_type($form['type']['#value']);
       foreach ($fields as $field => $registration_ids) {
@@ -445,10 +472,41 @@ function media_active_fields_for_node_type($type_name, $function = 'resource') {
       ),
     );
   }
+  
+  // Need to know if the type-specific or global settings are going to be used.
+  // At least one of them is enabled at this point.
+  $type_override = variable_get('media_'. $type_name .'_override', false);
+
   $items = array();
   // extract the fields for this node type
   foreach ((array)$type['fields'] as $field_name => $field) {
-    $items[] = variable_get('media_'. $type_name .'_'. $field['field_name'] .'_'. $function, array());
+    // Ignore the content-type specific per-field setting unless the override is set
+    $fields_enabled = false;
+    if ($type_override) {
+      $fields_enabled = variable_get('media_'. $type_name .'_'. $field['field_name'] .'_'. $function,false);
+    }
+    else {
+      //@TODO: Right now, if it's using the default it will be enabled for all fields.
+      // Eventually it will probably be better to allow per-field controls at a global level as well.
+      // However, this line will probably just work once the actual variables exist.
+      $fields_enabled = variable_get('media_global_'. $field['field_name'] .'_'. $function,'default');
+      // Handle the default special, because we want the default to be on for all fields but don't know what the fields are yet.
+      if ($fields_enabled === 'default') {
+        $fields_enabled = array();
+        foreach (media_registration_kinds() as $kind) {
+          // get all the kinds that match this field
+          if ($registrations = media_get_fields($field['type'], $kind)) {
+            foreach ($registrations as $id => $registration) {
+              $compound_id = $field['field_name'] .'--'. $id;
+              $fields_enabled[$compound_id] = $compound_id;
+            }
+          }
+        }
+      }
+    }
+    if (!empty($fields_enabled)) {
+      $items[] = $fields_enabled;
+    }
   }
 
   $data = array();
