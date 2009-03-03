@@ -2,6 +2,10 @@
 
 Changelog for the Resource module.
 
+March 2009
+----------
+ * Move hook_boot includes to hook_init: cached pages are cached; unnecessary overhead (aaron).
+
 February 2009
 -------------
  * #375876/kwinters D6 Permissions Fix for Resource Module (kwinters).

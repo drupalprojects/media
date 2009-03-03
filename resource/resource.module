@@ -29,35 +29,18 @@
  */
 
 /**
- * Implementation of hook_boot().
+ * Implementation of hook_init().
  *
  * Registers core stream handlers for public and private files.
  */
-function resource_boot() {
-  // We don't have drupal_get_path at this time.
-  $path = variable_get('resource_path', '');
-  include_once($path .'/ResourceStreamWrapperManager.inc');
-  include_once($path .'/ResourceStreamWrapper.inc');
-  include_once($path .'/ResourcePublicStreamWrapper.inc');
-  include_once($path .'/ResourcePrivateStreamWrapper.inc');
-  include_once($path .'/ResourceReadOnlyStreamWrapper.inc');
-/*  module_load_include('inc', 'resource', 'ResourceStreamWrapperManager');
+function resource_init() {
+  module_load_include('inc', 'resource', 'ResourceStreamWrapperManager');
   module_load_include('inc', 'resource', 'ResourceStreamWrapper');
   module_load_include('inc', 'resource', 'ResourcePublicStreamWrapper');
-  module_load_include('inc', 'resource', 'ResourcePrivateStreamWrapper');*/
+  module_load_include('inc', 'resource', 'ResourcePrivateStreamWrapper');
   $manager = ResourceStreamWrapperManager::singleton();
   $manager->register('public',   'ResourcePublicStreamWrapper');
   $manager->register('private',  'ResourcePrivateStreamWrapper');
-}
-
-/**
- *  Implements hook_exit().
- */
-function resource_exit() {
-  // If we've moved our module, then make sure we know that on the next page load.
-  if (variable_get('resource_path', '') != drupal_get_path('module', 'resource')) {
-    variable_set('resource_path', drupal_get_path('module', 'resource'));
-  }
 }
 
 /**
