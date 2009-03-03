@@ -608,7 +608,7 @@ function media_tabs_form($forms) {
   // Load our css.
   drupal_add_css(drupal_get_path('module', 'media') .'/media.css');
   // Load our js.
-  drupal_add_js(drupal_get_path('module', 'media') .'/media.js');
+  drupal_add_js(drupal_get_path('module', 'media') .'/javascript/media.js');
 
   $form = array();
   // Build the activator for the media browser.
