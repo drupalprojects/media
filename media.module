@@ -192,29 +192,6 @@ function media_get_registered_modules($ids = NULL, $reset = FALSE) {
 }
 
 
-/**
- * Generic hook call for media.
- * @TODO Document this function more. What is it for?
- *
- * @param string $hook
- *   hook name
- * @return array
- */
-function media_extend($hook) {
-  $data = array();
-  // Get a list of the modules that implement this hook.
-  foreach (module_implements($hook) as $module) {
-    // Add the data keyed by module name.
-    if ($result = module_invoke($module, $hook)) {
-      $data[$module] = $result;
-    }
-  }
-  if (count($data)) {
-    return $data;
-  }
-}
-
-
 /* ***************************************** */
 /* Media API Functions                       */
 /* ***************************************** */
@@ -607,8 +584,10 @@ function media_tabs_form($forms) {
   // @TODO We currently depend on tabs module for this.
   // Load our css.
   drupal_add_css(drupal_get_path('module', 'media') .'/media.css');
-  // Load our js.
+  // Load our specific js for the file selector
   drupal_add_js(drupal_get_path('module', 'media') .'/javascript/media.js');
+  // load the md5 library so we can hash the upload filename for use in the meta form
+  drupal_add_js(drupal_get_path('module', 'media') .'/javascript/jquery.md5.js');
 
   $form = array();
   // Build the activator for the media browser.

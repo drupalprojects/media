@@ -65,12 +65,16 @@
  
  
  /**
-  * This handles passing the current file data from the media browser
-  * to the formater function and returns the correct form elements
+  * Generate a MD5 hash of the file being uploaded
   */
 $(document).ready(function () {
- 
- 
+  // get the value from the file field 
+  $('#edit-field-file-media-media-tabs-tab-Addfiles-media-upload-resource-Newfile-resource-form-media-upload-upload').change(function () {
+    // Add the MD5 hash from the file name to the upload URL
+    Drupal.settings['ahah']['edit-attach']['url'] += '/'+$.md5($(this).val());
+    // @TODO now add the MD5 value to the meta data form    
+    alert(Drupal.settings['ahah']['edit-attach']['url']);    
+  });
 });
  
   
