@@ -4,6 +4,7 @@ Changelog for the Resource module.
 
 March 2009
 ----------
+ * ResourceReadOnlyStreamWrapper implements ResourceStreamWrapperInterface (aaron).
  * Move hook_boot includes to hook_init: cached pages are cached; unnecessary overhead (aaron).
 
 February 2009
