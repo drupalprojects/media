@@ -61,6 +61,14 @@ function media_ahah_debug($array) {
 /**
  *  AHAH form displayed under the file selector.
  *
+ *  This pop-ups after the user selects or uploads a file, and then clicks the
+ *  'Add' button. This AHAH form will do things like find metadata to associate
+ *  with the file, and perhaps ask some information about how to format it.
+ *
+ *  It's important to note that we do not yet have a File Object (fid) at this
+ *  stage, so we're working from an md5 hash, that Drupal will later compare to
+ *  ensure we're still on the same page.
+ *
  *  @param array $form_state
  *  @param array $options
  *  @param array $forms
