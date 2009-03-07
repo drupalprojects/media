@@ -1,0 +1,8 @@
+; $Id$
+
+name = Media Drupal Media Mover Module
+description = Provides integration with the Media Mover Module
+package = "Media"
+core = 6.x
+dependencies[] = media
+dependencies[] = media_mover_api
