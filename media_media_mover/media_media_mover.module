@@ -102,7 +102,7 @@ function media_media_mover_all_files($node_type, $field, $uid) {
 function media_media_mover_user_files($node_type, $field, $uid) {
   global $user;
   $files = array();
-  $results = db_query('SELECT complete_file FROM {media_mover_files} mmf LEFT JOIN {node} s ON mmf.nid = n.nid LEFT JOIN {users} u ON u.uid = n.uid WHERE u.uid = %d ORDER BY n.created DESC', $user->uid);
+  $results = db_query('SELECT complete_file FROM {media_mover_files} mmf LEFT JOIN {node} n ON mmf.nid = n.nid LEFT JOIN {users} u ON u.uid = n.uid WHERE u.uid = %d ORDER BY n.created DESC', $user->uid);
   while ($file = db_fetch_array($results)) {
     $files[] = array(
       'uri' => $file['complete_file'],
