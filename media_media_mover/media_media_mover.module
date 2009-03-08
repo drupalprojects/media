@@ -111,8 +111,8 @@ function media_media_mover_user_files($node_type, $field, $uid) {
     );
   }
   return array(
-    t('Media Mover') => array(
-      t('My Media Mover files') => media_resource_display_user_files_form($files, t('My Media Mover files')),
+    t('My files') => array(
+      t('Media Mover files') => media_resource_display_user_files_form($files, t('My Media Mover files')),
     )
   );
 }
