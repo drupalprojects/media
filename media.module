@@ -576,11 +576,12 @@ function media_build_browser_form($registration_ids, $node_type, $field, $uid) {
         // @TODO check drawer access permissions here to make 
         //       sure we should present this to the user
         
-        $drawer_id = strtolower(str_replace(' ', '_', $drawer_name));
-        // create a with a specific id to call
+        // the drawer id needs to have additional data on it to prevent
+        // name space conflicts with ids
+        $drawer_id = strtolower(str_replace(' ', '_', $drawer_name)) .'_display';
+        // create a link with a specific id to call
         $drawers_link = '<a onclick="javascript: return false;" href="#'. $drawer_id .'">'. $drawer_name .'</a>';
-        $drawer_list[] = array('data' => $drawers_link, 'class' => $drawer_id . ($active_drawer ? ' active' : null) ); 
-
+        $drawer_list[] = array('data' => $drawers_link, 'class' =>  ($active_drawer ? 'active' : '') ); 
         // add the drawer form element        
         $form['media_browser'][$tab_id][$drawer_name] = $drawer_data;
         // add classes to the drawer display item

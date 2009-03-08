@@ -34,11 +34,11 @@ function theme_media_file_list($element) {
 function theme_media_browser_pane($form) {
   $output = array();
   // render the drawers
-  $output[] = '<div '. drupal_attributes($form['#attributes']) .'>';
+  $output[] = '<div'. drupal_attributes($form['#attributes']) .'>';
   // render the drawer list
   $output[] = '  <div class="browser drawers">';  
   $output[] = drupal_render_form(null, $form['drawers']);
-  $output[] = '  </div>';
+  $output[] = ' </div>';
   // render the drawer displays
   $output[] = drupal_render_form(null, $form);
   $output[] = '</div>';

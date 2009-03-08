@@ -37,13 +37,13 @@
     }
     // we need to get the tab page that this drawer is in
     var parent = $(this).parents('.ui-tabs-panel').attr('id');
-    // hide current active display
-    $('#'+parent+' .display.active').removeClass('active').hide();
+    // hide current active drawer display
+    $('#'+parent+' .drawer.display.active').removeClass('active').hide();
     // set any drawers to not active
     $('#'+parent+' .drawers li.active').removeClass('active');
     // make this drawer active
     $(this).addClass('active');
-    // make the correct display active
+    // make the requested drawer display active
     $(display_id).addClass('active').show();
    });
    
