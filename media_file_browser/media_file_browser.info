@@ -1,0 +1,7 @@
+; $Id$
+
+name = Media File Browser Module
+description = Provides file browsing selection for the Media Module
+package = "Media"
+core = 6.x
+dependencies[] = media
