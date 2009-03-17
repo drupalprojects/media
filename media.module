@@ -42,7 +42,7 @@ function media_menu() {
     'access arguments' => array('administer media'),
     'file' => 'media_admin.inc',
   );
-  
+
   // Default settings, for content types that do not have their own.
   $items['admin/content/media/global'] = array(
     'title' => 'Global and Default Media Settings',
@@ -53,7 +53,7 @@ function media_menu() {
     'file' => 'media_admin.inc',
     'weight' => 3,
   );
-  
+
   // Top-level page for content types, split off because it gets crowded.
   $items['admin/content/media/types'] = array(
     'title' => 'Content Type Settings',
@@ -63,7 +63,7 @@ function media_menu() {
     'access arguments' => array('administer media'),
     'file' => 'media_admin.inc',
   );
-  
+
   // Build pages for each content type.
   $content_types = node_get_types();
   if ($content_types) {
@@ -79,7 +79,7 @@ function media_menu() {
       );
     }
   }
-  
+
   return $items;
 }
 
@@ -164,27 +164,38 @@ function media_theme() {
  */
 function media_get_registered_modules($ids = NULL, $reset = FALSE) {
   static $registrations;
+
   // Only build cache the first time the function is called, or if we reset it.
   if (is_null($registrations) || $reset) {
     $registrations = array();
     // Get all the modules which implement media_register().
     foreach (module_implements('media_register') as $module) {
       $function = $module .'_media_register';
-      // Get all the registrations.
+      // Get all the registrations defined by the module.
       $registration = $function();
-      // Add the module name to each registration.
+
+      // Iterate through each registration defined by the implementing module.
       foreach (array_keys($function()) as $key) {
-        $registration[$key]['module'] = $module;
+        // Add the module name to each registration.
+        // Default the 'module' key of the registration to the implementing module.
+        $registration[$key]['module'] = $registration[$key]['module'] ? $registration[$key]['module'] : $module;
+
+        // Default the 'uri' to public://.
         if (!$registraton[$key]['uri']) {
           $registration[$key]['uri'] = MEDIA_RESOURCE_URI_DEFAULT;
         }
+
+        // Default 'types' to * (all).
         if (!$registration[$key]['types']) {
           $registration[$key]['types'] = MEDIA_TYPES_DEFAULT;
         }
       }
+
+      // Add the new registrations to our total.
       $registrations = array_merge($registrations, $registration);
     }
   }
+
   // Return requested registrations.
   if ($ids) {
     foreach ($ids as $id) {
@@ -192,6 +203,7 @@ function media_get_registered_modules($ids = NULL, $reset = FALSE) {
     }
     return $return;
   }
+
   return $registrations;
 }
 
@@ -453,7 +465,7 @@ function media_active_fields_for_node_type($type_name, $function = 'resource') {
       ),
     );
   }
-  
+
   // Need to know if the type-specific or global settings are going to be used.
   // At least one of them is enabled at this point.
   $type_override = variable_get('media_'. $type_name .'_override', false);
@@ -536,7 +548,7 @@ function media_build_browser_form($registration_ids, $node_type, $field, $uid) {
   drupal_add_js(drupal_get_path('module', 'media') .'/javascript/media.js');
   // load the md5 library so we can hash the upload filename for use in the meta form
   drupal_add_js(drupal_get_path('module', 'media') .'/javascript/jquery.md5.js');
-  
+
   $items = array();
   $form = array();
 
@@ -544,28 +556,28 @@ function media_build_browser_form($registration_ids, $node_type, $field, $uid) {
     '#type' => 'markup',
     '#value' => '<div class="media browser activation">'. t('Add files') .'</div>',
   );
-  
+
   // we are using a tab form type
   $form['media_browser'] = array(
     '#type' => 'tabset',
     '#attributes' => array('class' => 'media browser wrapper'),
   );
-  
-  // Get all the active resources 
+
+  // Get all the active resources
   $resources = media_get_resources($registration_ids, $node_type, $field, $uid);
 
   // loop through the form and start pulling out the data to
-  // create tabs -> panes -> drawers 
+  // create tabs -> panes -> drawers
   foreach($resources as $tab_name => $data) {
     // create a tab id
     $tab_id = strtolower(str_replace(' ', '_', $tab_name));
-    // create tab 
+    // create tab
     $form['media_browser'][$tab_id] = array(
       '#type' => 'tabpage',
       '#title' => $tab_name,
       '#theme' => 'media_browser_pane',
     );
-    
+
     // build the drawers for this tab
     $drawer_list = array();
     $active_drawer = true;
@@ -573,21 +585,21 @@ function media_build_browser_form($registration_ids, $node_type, $field, $uid) {
     if (is_array($data)) {
       $drawers = array();
       foreach ($data as $drawer_name => $drawer_data) {
-        // @TODO check drawer access permissions here to make 
+        // @TODO check drawer access permissions here to make
         //       sure we should present this to the user
-        
+
         // the drawer id needs to have additional data on it to prevent
         // name space conflicts with ids
         $drawer_id = strtolower(str_replace(' ', '_', $drawer_name)) .'_display';
         // create a link with a specific id to call
         $drawers_link = '<a onclick="javascript: return false;" href="#'. $drawer_id .'">'. $drawer_name .'</a>';
-        $drawer_list[] = array('data' => $drawers_link, 'class' =>  ($active_drawer ? 'active' : '') ); 
-        // add the drawer form element        
+        $drawer_list[] = array('data' => $drawers_link, 'class' =>  ($active_drawer ? 'active' : '') );
+        // add the drawer form element
         $form['media_browser'][$tab_id][$drawer_name] = $drawer_data;
         // add classes to the drawer display item
         $form['media_browser'][$tab_id][$drawer_name]['#prefix'] = '<div id="'. $drawer_id .'" class="drawer display ' . ($active_drawer ? ' active' : null) .'">';
         $form['media_browser'][$tab_id][$drawer_name]['#suffix'] = '</div>';
-        
+
         // no longer on the first drawer
         $active_drawer = false;
       }
@@ -598,7 +610,7 @@ function media_build_browser_form($registration_ids, $node_type, $field, $uid) {
       );
     }
   }
-  
+
   // build the tabs into a single form element
   // @TODO make sure we have children for each tab and remove any that
   //       we don't have data for
@@ -606,7 +618,7 @@ function media_build_browser_form($registration_ids, $node_type, $field, $uid) {
     '#type' => 'markup',
     '#value' => theme('item_list', $tabs, null, 'ul', array('class' => 'tabs')),
   );
-  
+
   return $form;
 }
 
