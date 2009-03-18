@@ -2,6 +2,7 @@
 
 March 2009
 ----------
+ * Fix error re. is_null(variable_get...) (aaron).
  * Documentation (aaron).
  * Begin refactor & debug ahah (aaron).
  * Documentation of media_formater_ahah_form (aaron).

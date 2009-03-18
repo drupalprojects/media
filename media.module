@@ -97,7 +97,7 @@ function media_form_alter(&$form, $form_state, $form_id) {
   // Add the media browser on the node add/edit screen.
   if (strstr($form_id, 'node_form') ) {
     // Is the media browser enabled on this node type? Type-specific options override the default.
-    if (isset(variable_get('media_'. $form['type']['#value'] .'_override', null))) {
+    if (variable_get('media_'. $form['type']['#value'] .'_override', NULL) !== NULL) {
       $enabled = variable_get('media_'. $form['type']['#value'] .'_enabled', NULL);
     }
     else {
