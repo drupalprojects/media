@@ -2,6 +2,11 @@
 
 March 2009
 ----------
+ * Rename media/ahah path to media/js and remove args (aaron).
+ * Refactor ahah (aaron).
+ * Attach ahah behavior (aaron).
+ * Re-add Add button (aaron).
+ * Uppercase for TRUE/FALSE/NULL (aaron).
  * Fix error re. is_null(variable_get...) (aaron).
  * Documentation (aaron).
  * Begin refactor & debug ahah (aaron).

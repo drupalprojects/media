@@ -29,7 +29,7 @@ define('MEDIA_TYPES_DEFAULT', '*');
 function media_menu() {
   // AJAX formatter. This page is used to create the formatter form
   // when adding a new file, after selecting a file and pressing 'Add'.
-  $items['media/ahah'] = array(
+  $items['media/js'] = array(
     'page callback' => 'media_ahah_formatter_load',
     'access arguments' => array('access content'),
     'file' => 'media_ahah.inc',
@@ -177,7 +177,7 @@ function media_get_registered_modules($ids = NULL, $reset = FALSE) {
   static $registrations;
 
   // Only build cache the first time the function is called, or if we reset it.
-  if (is_null($registrations) || $reset) {
+  if (is_NULL($registrations) || $reset) {
     $registrations = array();
     // Get all the modules which implement media_register().
     foreach (module_implements('media_register') as $module) {
@@ -350,7 +350,7 @@ function media_get_registration_kinds($kind = NULL) {
 function media_registration_item_formatters($description = '*', $registrations = NULL) {
   $formatters = array();
   // Get all the registrations if we don't have any.
-  if (is_null($registrations)) {
+  if (is_NULL($registrations)) {
     $registrations = media_get_registered_modules();
   }
   // Iterate through each of the registered modules and find the formatters.
@@ -481,15 +481,15 @@ function media_active_fields_for_node_type($type_name, $function = 'resource') {
 
   // Need to know if the type-specific or global settings are going to be used.
   // At least one of them is enabled at this point.
-  $type_override = variable_get('media_'. $type_name .'_override', false);
+  $type_override = variable_get('media_'. $type_name .'_override', FALSE);
 
   $items = array();
   // extract the fields for this node type
   foreach ((array)$type['fields'] as $field_name => $field) {
     // Ignore the content-type specific per-field setting unless the override is set
-    $fields_enabled = false;
+    $fields_enabled = FALSE;
     if ($type_override) {
-      $fields_enabled = variable_get('media_'. $type_name .'_'. $field['field_name'] .'_'. $function,false);
+      $fields_enabled = variable_get('media_'. $type_name .'_'. $field['field_name'] .'_'. $function,FALSE);
     }
     else {
       //@TODO: Right now, if it's using the default it will be enabled for all fields.
@@ -593,7 +593,7 @@ function media_build_browser_form($registration_ids, $node_type, $field, $uid) {
 
     // build the drawers for this tab
     $drawer_list = array();
-    $active_drawer = true;
+    $active_drawer = TRUE;
     // check to see if we do have children- we should, but just in case
     if (is_array($data)) {
       $drawers = array();
@@ -605,21 +605,36 @@ function media_build_browser_form($registration_ids, $node_type, $field, $uid) {
         // name space conflicts with ids
         $drawer_id = strtolower(str_replace(' ', '_', $drawer_name)) .'_display';
         // create a link with a specific id to call
-        $drawers_link = '<a onclick="javascript: return false;" href="#'. $drawer_id .'">'. $drawer_name .'</a>';
+        $drawers_link = '<a onclick="javascript: return FALSE;" href="#'. $drawer_id .'">'. $drawer_name .'</a>';
         $drawer_list[] = array('data' => $drawers_link, 'class' =>  ($active_drawer ? 'active' : '') );
         // add the drawer form element
         $form['media_browser'][$tab_id][$drawer_name] = $drawer_data;
         // add classes to the drawer display item
-        $form['media_browser'][$tab_id][$drawer_name]['#prefix'] = '<div id="'. $drawer_id .'" class="drawer display ' . ($active_drawer ? ' active' : null) .'">';
+        $form['media_browser'][$tab_id][$drawer_name]['#prefix'] = '<div id="'. $drawer_id .'" class="drawer display ' . ($active_drawer ? ' active' : NULL) .'">';
         $form['media_browser'][$tab_id][$drawer_name]['#suffix'] = '</div>';
 
         // no longer on the first drawer
-        $active_drawer = false;
+        $active_drawer = FALSE;
       }
       // change the drawers to a list for easer display
       $form['media_browser'][$tab_id]['drawers'] = array(
         '#type' => 'markup',
-        '#value' => theme('item_list', $drawer_list, null, 'ul', array('class' => 'drawers'))
+        '#value' => theme('item_list', $drawer_list, NULL, 'ul', array('class' => 'drawers'))
+      );
+
+      // Our AHAH enabled submit button.
+      $form['media_browser']['media_browser_submit'] = array(
+        '#type' => 'submit',
+        '#value' => t('Add file'),
+        '#description' => t("Add the selected file."),
+        '#weight' => 1,
+        '#submit' => array('media_browser_submit'), // If no javascript action.
+        '#ahah' => array(
+          'path' => 'media/js',
+          'wrapper' => 'media-submit',
+          'method' => 'replace',
+          'effect' => 'fade',
+        ),
       );
     }
   }
@@ -629,7 +644,7 @@ function media_build_browser_form($registration_ids, $node_type, $field, $uid) {
   //       we don't have data for
   $form['tabs'] = array(
     '#type' => 'markup',
-    '#value' => theme('item_list', $tabs, null, 'ul', array('class' => 'tabs')),
+    '#value' => theme('item_list', $tabs, NULL, 'ul', array('class' => 'tabs')),
   );
 
   return $form;
@@ -784,3 +799,6 @@ function media_file_list_element_validate($element, $form_state) {
   return $element;
 }
 
+function media_browser_submit(&$form, $form_state) {
+  drupal_set_message('media_browser_submit');
+}
