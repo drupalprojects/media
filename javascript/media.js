@@ -1,14 +1,14 @@
 // $Id$
 
 /**
- * @file
- * This file handles the JS for Media Module functions
+ *  @file
+ *  This file handles the JS for Media Module functions
  */
 
 
 /**
- * This handles the display, activation and
- * hiding  of drawers on the media browser form.
+ *  This handles the display, activation and
+ *  hiding  of drawers on the media browser form.
  */
 Drupal.behaviors.mediaDrawers = function (context) {
 
@@ -49,8 +49,8 @@ Drupal.behaviors.mediaDrawers = function (context) {
 };
 
 /**
- * We need to hide any form elements that were replaced by the media browser form
- * activate the add button, and hide the browser.
+ *  We need to hide any form elements that were replaced by the media browser
+ *  form, activate the add button, and hide the browser.
  */
 Drupal.behaviors.mediaBrowserHide = function (context) {
   $('.media.browser.wrapper:not(.mediaBrowserHide-processed)', context).addClass('mediaBrowserHide-processed').hide();
@@ -64,7 +64,7 @@ Drupal.behaviors.mediaBrowserHide = function (context) {
 };
 
 /**
- * Generate a MD5 hash of the file being uploaded
+ *  Generate a MD5 hash of the file being uploaded
  */
 Drupal.behaviors.mediaGenerateMD5 = function (context) {
   // Get the value from the file field.
