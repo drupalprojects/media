@@ -75,3 +75,11 @@ Drupal.behaviors.mediaGenerateMD5 = function (context) {
     alert(Drupal.settings['ahah']['edit-attach']['url']);
   });
 };
+
+Drupal.behaviors.mediaAhahHideBrowser = function (context) {
+  $('.media-browser-submit:not(.mediaAhahHideBrowser-processed)', context).addClass('mediaAhahHideBrowser-processed').bind('click', function () {
+    $(this).hide();
+    $parent = $(this).parent();
+    $parent.children('ul').slideDown();
+  });
+};

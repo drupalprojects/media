@@ -637,8 +637,9 @@ function media_build_browser_form($registration_ids, $node_type, $field, $uid) {
         '#type' => 'submit',
         '#value' => t('Add file'),
         '#description' => t("Add the selected file."),
-        '#weight' => 1,
+//         '#weight' => 1,
         '#submit' => array('media_browser_submit'), // If no javascript action.
+        '#attributes' => array('class' => 'media-browser-submit'),
         '#ahah' => array(
           'path' => 'media/js',
           'wrapper' => 'media-browser-file-progress',

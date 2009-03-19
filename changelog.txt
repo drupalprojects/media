@@ -2,6 +2,8 @@
 
 March 2009
 ----------
+ * Begin mediaAhahHideBrowser (aaron).
+ * Add class to ahah submit button (aaron).
  * Begin file browser indicator (aaron).
  * Drupal.behaviors.mediaDrawers (aaron).
  * Drupal.behaviors.mediaBrowserHide (aaron).
