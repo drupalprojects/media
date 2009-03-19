@@ -2,6 +2,7 @@
 
 March 2009
 ----------
+ * Drupal.behaviors.mediaDrawers (aaron).
  * Drupal.behaviors.mediaBrowserHide (aaron).
  * Drupal.behaviors.mediaGenerateMD5 (aaron).
  * Rename media/ahah path to media/js and remove args (aaron).
