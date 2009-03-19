@@ -51,24 +51,24 @@
 
 
  /**
-  * we need to hide any form elements that were replaced by the media browser form
-  * activate the add button, and hide the browser
+  * We need to hide any form elements that were replaced by the media browser form
+  * activate the add button, and hide the browser.
   */
- $(document).ready(function () {
-   $('.media.browser.wrapper').hide();
-   $('.media.browser.activation').each(function () {
+Drupal.behaviors.mediaBrowserHide = function (context) {
+   $('.media.browser.wrapper:not(.mediaBrowserHide-processed)', context).addClass('mediaBrowserHide-processed').hide();
+   $('.media.browser.activation:not(.mediaBrowserHide-processed)', context).addClass('mediaBrowserHide-processed').each(function () {
      $(this).next('.media.browser').hide();
      $(this).click(function () {
        $(this).next('.media.browser').slideDown('slow');
        $(this).slideUp();
      });
    });
- });
+ };
 
 /**
  * Generate a MD5 hash of the file being uploaded
  */
-Drupal.behaviors.mediaGenerateMD5 = function(context) {
+Drupal.behaviors.mediaGenerateMD5 = function (context) {
   // Get the value from the file field.
   $('#edit-field-file-media-media-tabs-tab-Addfiles-media-upload-resource-Newfile-resource-form-media-upload-upload:not(.mediaGenerateMD5-processed)', context).addClass('mediaGenerateMD5-processed').change(function () {
     // Add the MD5 hash from the file name to the upload URL.
