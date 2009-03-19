@@ -2,6 +2,7 @@
 
 March 2009
 ----------
+ * Begin file browser indicator (aaron).
  * Drupal.behaviors.mediaDrawers (aaron).
  * Drupal.behaviors.mediaBrowserHide (aaron).
  * Drupal.behaviors.mediaGenerateMD5 (aaron).
