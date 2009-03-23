@@ -624,7 +624,7 @@ function media_build_browser_form($registration_ids, $node_type, $field, $uid) {
 
       // Container for the progress indicator.
       $form['media_browser']['media_browser_file_progress_wrapper'] = array(
-        '#prefix' => '<div id="media-browser-file-progress">',
+        '#prefix' => '<div class="media-browser-file-progress">',
         '#suffix' => '</div>',
       );
       $form['media_browser']['media_browser_file_progress_wrapper']['test'] = array(
@@ -646,8 +646,9 @@ function media_build_browser_form($registration_ids, $node_type, $field, $uid) {
           'method' => 'replace',
           'effect' => 'fade',
         ),
+        '#prefix' => '<div class="media-browser-submit-wrapper">',
+        '#suffix' => '</div>',
       );
-
     }
   }
 

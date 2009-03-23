@@ -2,6 +2,7 @@
 
 March 2009
 ----------
+ * Attempt piggyback AHAH behavior to button wrapper (see http://groups.drupal.org/node/20429) (aaron).
  * Begin mediaAhahHideBrowser (aaron).
  * Add class to ahah submit button (aaron).
  * Begin file browser indicator (aaron).

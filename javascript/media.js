@@ -77,9 +77,13 @@ Drupal.behaviors.mediaGenerateMD5 = function (context) {
 };
 
 Drupal.behaviors.mediaAhahHideBrowser = function (context) {
-  $('.media-browser-submit:not(.mediaAhahHideBrowser-processed)', context).addClass('mediaAhahHideBrowser-processed').bind('click', function () {
+  $('.media-browser-submit-wrapper:not(.mediaAhahHideBrowser-processed)', context).addClass('mediaAhahHideBrowser-processed').bind('click', function() {
+    $(this).hide();
+  });
+
+/*  $('.media-browser-submit:not(.mediaAhahHideBrowser-processed)', context).addClass('mediaAhahHideBrowser-processed').bind('click', function () {
     $(this).hide();
     $parent = $(this).parent();
     $parent.children('ul').slideDown();
-  });
+  });*/
 };
