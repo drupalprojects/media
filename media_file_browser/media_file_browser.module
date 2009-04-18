@@ -79,7 +79,8 @@ function media_file_browser_media_register() {
 function media_file_browser_local_files($files, $title = NULL) {
 
   $pattern = ".*$";
-  $dir_files = file_scan_directory('/Users/arthur/Movies', $pattern, array(), null, false);
+  // @TODO how do we set the local file directory
+  $dir_files = file_scan_directory('YOUR/PATH/HERE', $pattern, array(), null, false);
   foreach($dir_files as $a_file) {
     if (is_dir($a_file->filename)) {
       $display_files[$a_file->filename .'/'] = $a_file->basename .' (directory)';
