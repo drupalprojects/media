@@ -2,6 +2,9 @@
 
 April 2009
 ----------
+ * Slide up the sibling file browser on submit (aaron).
+ * Add static $id count to media browser form for ahah wrapper (aaron).
+ * Bind behavior to click, and change ahah from default mousedown (aaron).
  * Troubleshooting click-bind ahah override behavior (aaron).
 
 March 2009

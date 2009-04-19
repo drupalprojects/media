@@ -559,6 +559,11 @@ function media_create_id($drawer_name) {
  *   Drupal FAPI form array.
  */
 function media_build_browser_form($registration_ids, $node_type, $field, $uid) {
+  static $id;
+
+  // We need a static counter for our form element wrapper.
+  $id += 1;
+
   // Load our css.
   drupal_add_css(drupal_get_path('module', 'media') .'/media.css');
   // Load our specific js for the file selector
@@ -628,11 +633,11 @@ function media_build_browser_form($registration_ids, $node_type, $field, $uid) {
       );
 
       // Container for the progress indicator.
-      $form['media_browser']['media_browser_file_progress_wrapper'] = array(
-        '#prefix' => '<div class="media-browser-file-progress">',
+      $form['media_browser']['media_browser_file_progress'] = array(
+        '#prefix' => '<div id="media-browser-file-progress-'. $id .'">',
         '#suffix' => '</div>',
       );
-      $form['media_browser']['media_browser_file_progress_wrapper']['test'] = array(
+      $form['media_browser']['media_browser_file_progress']['test'] = array(
         '#type' => 'item',
         '#title' => t('Test... File progress will go here...'),
       );
@@ -647,12 +652,15 @@ function media_build_browser_form($registration_ids, $node_type, $field, $uid) {
         '#attributes' => array('class' => 'media-browser-submit'),
         '#ahah' => array(
           'path' => 'media/js',
-          'wrapper' => 'media-browser-file-progress',
+          'wrapper' => 'media-browser-file-progress-'. $id,
           'method' => 'replace',
           'effect' => 'fade',
+          // The FAPI docs say a submit element defaults to 'click',
+          // but as of d6.10, it defaults to 'mousedown', so we need to specify.
+          'event' => 'click',
         ),
-        '#prefix' => '<div class="media-browser-submit-wrapper">',
-        '#suffix' => '</div>',
+//         '#prefix' => '<div class="media-browser-submit-wrapper">',
+//         '#suffix' => '</div>',
       );
     }
   }
