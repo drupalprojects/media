@@ -567,9 +567,8 @@ function media_build_browser_form($registration_ids, $node_type, $field, $uid) {
   // Load our css.
   drupal_add_css(drupal_get_path('module', 'media') .'/media.css');
   // Load our specific js for the file selector
-  // @TODO: Fix the bind('click') behavior. Changing js load order to test.
-  drupal_add_js(drupal_get_path('module', 'media') .'/javascript/media.js', 'theme');
-  // load the md5 library so we can hash the upload filename for use in the meta form
+  drupal_add_js(drupal_get_path('module', 'media') .'/javascript/media.js');
+  // Load the md5 library so we can hash the upload filename for use in the meta form.
   drupal_add_js(drupal_get_path('module', 'media') .'/javascript/jquery.md5.js');
 
   $items = array();
@@ -632,38 +631,37 @@ function media_build_browser_form($registration_ids, $node_type, $field, $uid) {
         '#value' => theme('item_list', $drawer_list, NULL, 'ul', array('class' => 'drawers'))
       );
 
-      // Container for the progress indicator.
-      $form['media_browser_file_progress'] = array(
-        '#prefix' => '<div id="media-browser-file-progress-'. $id .'">',
-        '#suffix' => '</div>',
-      );
-      $form['media_browser_file_progress']['test'] = array(
-        '#type' => 'item',
-        '#title' => t('Test... File progress will go here...'),
-      );
-
-      // Our AHAH enabled submit button.
-      $form['media_browser_submit'] = array(
-        '#type' => 'submit',
-        '#value' => t('Add file'),
-        '#description' => t("Add the selected file."),
-//         '#weight' => 1,
-        '#submit' => array('media_browser_submit'), // If no javascript action.
-        '#attributes' => array('class' => 'media-browser-submit'),
-        '#ahah' => array(
-          'path' => 'media/js',
-          'wrapper' => 'media-browser-file-progress-'. $id,
-          'method' => 'replace',
-          'effect' => 'fade',
-          // The FAPI docs say a submit element defaults to 'click',
-          // but as of d6.10, it defaults to 'mousedown', so we need to specify.
-          'event' => 'click',
-        ),
-//         '#prefix' => '<div class="media-browser-submit-wrapper">',
-//         '#suffix' => '</div>',
-      );
     }
   }
+
+  // Container for the progress indicator.
+  $form['media_browser']['media_browser_file_progress'] = array(
+    '#prefix' => '<div id="media-browser-file-progress-'. $id .'" class="media-browser-file-progress">',
+    '#suffix' => '</div>',
+  );
+  $form['media_browser']['media_browser_file_progress']['file_progress_message'] = array(
+    '#type' => 'item',
+    '#title' => t('@progress', array('@progress' => variable_get('media_file_progress_message', t('Please wait while your file is attached...')))),
+  );
+
+  // Our AHAH enabled submit button.
+  $form['media_browser']['media_browser_submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Add file'),
+    '#description' => t("Add the selected file."),
+    '#submit' => array('media_browser_submit'), // If no javascript action.
+    '#attributes' => array('class' => 'media-browser-submit'),
+    '#ahah' => array(
+      'path' => 'media/js',
+      'wrapper' => 'media-browser-file-progress-'. $id,
+      'method' => 'replace',
+      'effect' => 'fade',
+      // The FAPI docs say a submit element defaults to 'click',
+      // but as of d6.10, it defaults to 'mousedown', so we need to specify.
+      'event' => 'click',
+    ),
+  );
+
 
   // build the tabs into a single form element
   // @TODO make sure we have children for each tab and remove any that

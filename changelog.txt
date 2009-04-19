@@ -2,6 +2,8 @@
 
 April 2009
 ----------
+ * Move button/progress out of loop and back into browser (aaron).
+ * Store progress message in a variable (aaron).
  * Move button/progress out of browser (aaron).
  * Slide up the sibling file browser on submit (aaron).
  * Add static $id count to media browser form for ahah wrapper (aaron).

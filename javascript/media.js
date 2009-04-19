@@ -57,9 +57,13 @@ Drupal.behaviors.mediaBrowserHide = function (context) {
   $('.media.browser.activation:not(.mediaBrowserHide-processed)', context).addClass('mediaBrowserHide-processed').each(function () {
     $(this).next('.media.browser').hide();
     $(this).click(function () {
-      $(this).next('.media.browser').slideDown('slow');
+      $(this).next('.media.browser').slideDown('slow').next('.media-browser-submit').slideDown('slow');
       $(this).slideUp();
     });
+  });
+  // Hide our file progress indicators.
+  $('.media-browser-file-progress:not(.mediaBrowserHide-processed)', context).addClass('mediaBrowserHide-processed').each(function() {
+    $(this).hide();
   });
 };
 
@@ -80,6 +84,7 @@ Drupal.behaviors.mediaAhahHideBrowser = function (context) {
   $('.media-browser-submit:not(.mediaAhahHideBrowser-processed)', context).addClass('mediaAhahHideBrowser-processed').each(function() {
     $(this).bind('click', function() {
       $(this).hide().siblings('.ui-tabs-panel, ul').slideUp();
+      $(this).prev('.media-browser-file-progress').show();
     });
   });
 };
