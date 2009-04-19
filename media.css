@@ -78,3 +78,7 @@
   margin-left: 111px;
   padding: 0px 10px 10px 20px
 } 
+
+.media-browser-file-progress {
+  clear: both;
+  }
