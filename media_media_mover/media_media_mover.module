@@ -17,31 +17,25 @@
 function media_media_mover_media_register() {
   $registration = array();
   $registration['media_mover_all'] = array(
-    // human readable name
-    'name' => t('All Media Mover files'),
+    'name' => 'All Media Mover files',
+    'description' => t('Provides all Media Mover files'),
     'uri' => 'file',
     'kind' => 'resource',
-    'types' => '*',
-    'description' => t('Integrate Media Mover files'),
     'callbacks' => array(
       'resource' => 'media_media_mover_all_files',
-     ),
-     // human readable description
-    'description' => t('Provides all Media Mover files'),
+     ),    
     'fields' => array('attachments', 'filefield'),
   );
   $registration['media_mover_user'] = array(
     // human readable name
-    'name' => t('My Media Mover files'),
+    'name' => 'My Media Mover files',
+    'description' => 'Provides Media Mover generated files for this user',
     'uri' => 'file',
     'kind' => 'resource',
-    'types' => '*',
     'description' => t('Integrate Users Media Mover files'),
     'callbacks' => array(
       'resource' => 'media_media_mover_user_files',
      ),
-     // human readable description
-    'description' => t('Provides Media Mover generated files for this user'),
     'fields' => array('attachments', 'filefield'),
   );
   return $registration;

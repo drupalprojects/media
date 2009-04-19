@@ -191,6 +191,10 @@ function media_get_registered_modules($ids = NULL, $reset = FALSE) {
         // Default the 'module' key of the registration to the implementing module.
         $registration[$key]['module'] = $registration[$key]['module'] ? $registration[$key]['module'] : $module;
 
+        // translate strings now
+        $registration[$key]['name'] = t($registration[$key]['name']);
+        $registration[$key]['description'] = t($registration[$key]['description']);
+        
         // Default the 'uri' to public://.
         if (!$registraton[$key]['uri']) {
           $registration[$key]['uri'] = MEDIA_RESOURCE_URI_DEFAULT;

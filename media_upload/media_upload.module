@@ -14,53 +14,43 @@
   *   array
   */
 function media_upload_media_register() {
-  $registration = array(
-    'media_upload_resource' => array(
-      // human readable name
-      'name' => t('Media Upload resource'),
-      'kind' => 'resource',
-      'types' => '*',
-      'description' => t('Drupal uploaded files'),
-      // function to invoke when data is needed from this
-      'callbacks' => array(
-        'resource' => 'media_upload_media_user_files_select',
-      ),
-      // human readable description
-      'description' => t('Provides integration with Drupal\'s Upload module'),
-      // cck field types that this works on
-      'fields' => array('attachments', 'filefield'),
+  $items = array();
+  $items['media_upload_resource'] = array(
+    'name' => 'Media Upload resource',
+    'description' => t('Provides integration with Drupal\'s Upload module'),
+    'kind' => 'resource',
+    // function to invoke when data is needed from this
+    'callbacks' => array(
+      'resource' => 'media_upload_media_user_files_select',
     ),
-
-    'media_upload_display' => array(
-      // human readable name
-      'name' => t('Media Drupal Upload display FORMATTER'),
+    // cck field types that this works on
+    'fields' => array('attachments', 'filefield'),
+  );
+  
+  $items['media_upload_display'] = array(
+    'name' => 'Media Drupal Upload display FORMATTER',
+    'description' => 'Provides integration with Drupal\'s Upload module',
       'kind' => 'formatter',
       'callbacks' => array(
         'form' => 'media_upload_formatter_form',
       ),
-      'types' => '*',
-      'description' => t('Format Drupal uploaded files'),
-      // human readable description
-      'description' => t('Provides integration with Drupal\'s Upload module'),
       'fields' => array('attachments', 'filefield'),
-    ),
-    'media_upload_display2' => array(
-      // human readable name
-      'name' => t('Media Drupal Upload display'),
-      'uri' => 'file',
-      'kind' => 'resource',
-      'types' => '*',
-      'description' => t('Format Drupal uploaded files'),
-      'callbacks' => array(
-        'resource' => 'media_upload_media_user_files_select2',
-       ),
-       // human readable description
-      'description' => t('Provides integration with Drupal\'s Upload module'),
-      'fields' => array('attachments', 'filefield'),
-    ),
+    );
+    
+  $items['media_upload_display2'] = array(
+    // human readable name
+    'name' => 'Media Drupal Upload display',
+    'description' => t('Provides integration with Drupal\'s Upload module'),
+    'uri' => 'file',
+    'kind' => 'resource',
+    'types' => '*',
+    'callbacks' => array(
+      'resource' => 'media_upload_media_user_files_select2',
+     ),
+    'fields' => array('attachments', 'filefield'),
   );
 
-  return $registration;
+  return $items;
 }
 
 function media_upload_formatter_form($node_type, $field, $file_extension, $uri) {

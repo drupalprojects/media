@@ -8,56 +8,63 @@
  */
 
 
- /**
-  * Implementation of hook_media_register
-  * @return
-  *   array
-  */
+/**
+ * Implementation of hook_menu
+ *
+ * @return array
+ */
+function media_file_browser_menu() {
+  $items = array();
+  $items['media_file_browser/js'] = array(
+    'page callback' => 'media_ahah_formatter_load',
+    // @TODO figure out how access is being handled here... 
+    'access arguments' => array('access content'),
+    'file' => 'media_file_browser.inc',
+  );
+  return $items;
+}
+
+
+/**
+ * Implementation of hook_media_register
+ * @return
+ *   array
+ */
 function media_file_browser_media_register() {
   $registration = array();
   $registration['media_file_browser_directory'] = array(
     // human readable name
-    'name' => t('File Browser Local'),
+    'name' => 'File Browser Local',
+    'description' => 'Provides access to local files',
     'uri' => 'file',
     'kind' => 'resource',
-    'types' => '*',
-    'description' => t('Local file selection'),
     'callbacks' => array(
       'resource' => 'media_file_browser_local_files',
      ),
-     // human readable description
-    'description' => t('Provides access to local files'),
     'fields' => array('attachments', 'filefield'),
   );
   if (module_exists('s3_api')) {
     $registration['media_file_browser_s3'] = array(
-      // human readable name
-      'name' => t('File Browser S3'),
+      'name' => 'File Browser S3',
       'uri' => 'file',
       'kind' => 'resource',
-      'types' => '*',
-      'description' => t('Amazon S3 files'),
+      'description' => 'Provides access to files stored on Amazon\'s S3',
       'callbacks' => array(
         'resource' => 'media_file_browser_s3_files',
-       ),
-       // human readable description
-      'description' => t('Provides access to files stored on Amazon\'s S3'),
+       ),      
       'fields' => array('attachments', 'filefield'),
     );
   }
   if (module_exists('ftp_api')) {
     $registration['media_file_browser_ftp'] = array(
       // human readable name
-      'name' => t('File Browser FTP'),
+      'name' => 'File Browser FTP',
+      'description' => 'Provides access to files stored on the FTP server',
       'uri' => 'file',
       'kind' => 'resource',
-      'types' => '*',
-      'description' => t('FTP files'),
       'callbacks' => array(
         'resource' => 'media_file_browser_ftp_files',
        ),
-       // human readable description
-      'description' => t('Provides access to files stored on the FTP server'),
       'fields' => array('attachments', 'filefield'),
     );
   }
@@ -80,7 +87,8 @@ function media_file_browser_local_files($files, $title = NULL) {
 
   $pattern = ".*$";
   // @TODO how do we set the local file directory
-  $dir_files = file_scan_directory('YOUR/PATH/HERE', $pattern, array(), null, false);
+  $path = file_directory_path();
+  $dir_files = file_scan_directory($path, $pattern, array(), null, false);
   foreach($dir_files as $a_file) {
     if (is_dir($a_file->filename)) {
       $display_files[$a_file->filename .'/'] = $a_file->basename .' (directory)';
