@@ -4,8 +4,8 @@
  * @file
  * This provides the basic styling for the media browser elements
  */
- 
- 
+
+
 /* Style the show media browser link */
 .media.browser.activation{
   width: 112px;
@@ -16,7 +16,8 @@
   cursor: pointer;
 }
 
-.media.browser {
+.media.browser,
+.media-browser-metadata-wrapper {
   border: 1px solid #999999;
   padding: 5px;
 }
@@ -28,7 +29,7 @@
 
 /* style the pane which contains the drawers and drawer data */
 .media.browser .drawer.display{
-  min-height: 300px;  
+  min-height: 300px;
 }
 
 /* style the left hand drawers */
@@ -77,7 +78,7 @@
   border: 1px solid #999999;
   margin-left: 111px;
   padding: 0px 10px 10px 20px
-} 
+}
 
 .media-browser-file-progress {
   clear: both;

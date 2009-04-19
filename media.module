@@ -651,6 +651,7 @@ function media_build_browser_form($registration_ids, $node_type, $field, $uid) {
     '#value' => t('Add file'),
     '#description' => t("Add the selected file."),
     '#submit' => array('media_browser_submit'), // If no javascript action.
+    '#validate' => array('media_browser_validate'),
     '#attributes' => array('class' => 'media-browser-submit'),
     '#ahah' => array(
       'path' => 'media/js',
@@ -663,6 +664,21 @@ function media_build_browser_form($registration_ids, $node_type, $field, $uid) {
     ),
   );
 
+  $form['media_browser']['media_browser_metadata'] = array(
+    '#type' => 'tabset',
+    '#attributes' => array('class' => 'media-browser-metadata-wrapper'),
+  );
+
+  foreach (array('Video', 'Image', 'Audio', 'PDF') as $mime_type) {
+    $form['media_browser']['media_browser_metadata'][$mime_type] = array(
+      '#type' => 'tabpage',
+      '#title' => $mime_type,
+    );
+    $form['media_browser']['media_browser_metadata'][$mime_type][$mime_type .'_title'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Title'),
+    );
+  }
 
   // build the tabs into a single form element
   // @TODO make sure we have children for each tab and remove any that
@@ -824,6 +840,40 @@ function media_file_list_element_validate($element, $form_state) {
   return $element;
 }
 
+function media_browser_validate(&$form, $form_state) {
+  drupal_set_message('validating...');
+}
+
 function media_browser_submit(&$form, $form_state) {
-  drupal_set_message(theme('image', variable_get('media_file_progress_success', drupal_get_path('module', 'media') .'/images/check-green-blah.png')) . t('File attachment successful.'));
+  drupal_set_message(theme('image', variable_get('media_file_progress_success', drupal_get_path('module', 'media') .'/images/check-green-blah.png')) . t('File attachment: !file successful.', array('!file' => l($form_state['values']['media_files'], $form_state['values']['media_files']))));
+  drupal_set_message('(media_browser_submit will need to actually process the file here.)');
+//   dpm($form_state['values']);
+
+  // @TODO: This all goes in the form creation, actually,
+  // to create our metadata form...
+  $uri = $form_state['values']['media_files'];
+  $file_extension = pathinfo($uri, PATHINFO_EXTENSION);
+
+  // Get the file creator for this item.
+  $file_creator = media_get_registered_modules(array($registration_id));
+
+  // Get the formaters for this node type.
+  $formatters = media_active_fields_for_node_type($node_type, 'formatter');
+
+  // Get the registrations.
+  $registrations = media_get_registered_modules($formatters[$field]);
+
+  // Remove any non-applying registrations.
+  $registrations = media_get_applicable_formatters($registrations, $file_extension);
+
+  // Get all the formatting forms.
+  $formatter_options = array();
+  $forms = array();
+  foreach ($registrations as $id => $registration) {
+    $formatter_options[$id] = $registration['name'];
+    $function = $registration['callbacks']['form'];
+    if (function_exists($function)) {
+      $forms[$id] = $function($node_type, $field, $file_extension, $uri);
+    }
+  }
 }

@@ -55,6 +55,7 @@ Drupal.behaviors.mediaDrawers = function (context) {
 Drupal.behaviors.mediaBrowserHide = function (context) {
   // Hide our file progress indicators.
   $('.media-browser-file-progress:not(.mediaBrowserHide-processed)', context).addClass('mediaBrowserHide-processed').attr('style', 'display:none');
+  $('.media-browser-metadata-wrapper:not(.mediaBrowserHide-processed)', context).addClass('mediaBroswerHide-processed').hide();
 
   // Add behavior to our big red activation button.
   $('.media.browser.activation:not(.mediaBrowserHide-processed)', context).addClass('mediaBrowserHide-processed').each(function () {
@@ -86,6 +87,7 @@ Drupal.behaviors.mediaAhahHideBrowser = function (context) {
     $(this).bind('click', function() {
       $(this).hide().siblings('.ui-tabs-panel, ul').slideUp();
       $(this).prev('.media-browser-file-progress').show();
+      $(this).next('.media-browser-metadata-wrapper').show();
     });
   });
 };
