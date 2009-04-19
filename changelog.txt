@@ -1,5 +1,9 @@
 // $Id$
 
+April 2009
+----------
+ * Troubleshooting click-bind ahah override behavior (aaron).
+
 March 2009
 ----------
  * Attempt piggyback AHAH behavior to button wrapper (see http://groups.drupal.org/node/20429) (aaron).

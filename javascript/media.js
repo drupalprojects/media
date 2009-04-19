@@ -77,8 +77,13 @@ Drupal.behaviors.mediaGenerateMD5 = function (context) {
 };
 
 Drupal.behaviors.mediaAhahHideBrowser = function (context) {
-  $('.media-browser-submit-wrapper:not(.mediaAhahHideBrowser-processed)', context).addClass('mediaAhahHideBrowser-processed').bind('click', function() {
-    $(this).hide();
+  $('.media-browser-submit:not(.mediaAhahHideBrowser-processed)', context).addClass('mediaAhahHideBrowser-processed').each(function() {
+    $(this).removeClass('ahah-processed').unbind('click').bind('click', function() {
+      console.log('We now have successfully invoked our click-bound behavior. Hurray!');
+    });
+    console.log('Attempted to bind click to ' + $(this).attr('class'));
+      // form-submit media-browser-submit mediaAhahHideBrowser-processed ahah-processed
+//       Drupal.behaviors.ahah(document);
   });
 
 /*  $('.media-browser-submit:not(.mediaAhahHideBrowser-processed)', context).addClass('mediaAhahHideBrowser-processed').bind('click', function () {

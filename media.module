@@ -194,7 +194,7 @@ function media_get_registered_modules($ids = NULL, $reset = FALSE) {
         // translate strings now
         $registration[$key]['name'] = t($registration[$key]['name']);
         $registration[$key]['description'] = t($registration[$key]['description']);
-        
+
         // Default the 'uri' to public://.
         if (!$registraton[$key]['uri']) {
           $registration[$key]['uri'] = MEDIA_RESOURCE_URI_DEFAULT;
@@ -562,7 +562,8 @@ function media_build_browser_form($registration_ids, $node_type, $field, $uid) {
   // Load our css.
   drupal_add_css(drupal_get_path('module', 'media') .'/media.css');
   // Load our specific js for the file selector
-  drupal_add_js(drupal_get_path('module', 'media') .'/javascript/media.js');
+  // @TODO: Fix the bind('click') behavior. Changing js load order to test.
+  drupal_add_js(drupal_get_path('module', 'media') .'/javascript/media.js', 'theme');
   // load the md5 library so we can hash the upload filename for use in the meta form
   drupal_add_js(drupal_get_path('module', 'media') .'/javascript/jquery.md5.js');
 
