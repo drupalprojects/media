@@ -34,6 +34,11 @@ function media_menu() {
     'access arguments' => array('access content'),
     'file' => 'media_ahah.inc',
   );
+  $items['media/metadata/js'] = array(
+    'page callback' => 'media_ahah_metadata_ahah',
+    'access arguments' => array('access content'),
+    'file' => 'media_ahah.inc',
+  );
 
   // Media configuration parent path.
   $items['admin/content/media'] = array(
@@ -439,7 +444,7 @@ function media_get_resources($registration_ids, $node_type, $field, $uid) {
     if (function_exists($function)) {
       // Get the results of the callback function.
       $item = $function($node_type, $field, $uid);
-      $tab_name = key($item);
+      $tab_name = check_plain(key($item));
       // Add a resource_id to the item.
       $item[$tab_name][key($item[$tab_name])]['resource_id'] = array(
         '#type' => 'value',
@@ -589,6 +594,9 @@ function media_build_browser_form($registration_ids, $node_type, $field, $uid) {
   // Get all the active resources
   $resources = media_get_resources($registration_ids, $node_type, $field, $uid);
 
+  // Store the tab & drawer names for the js form selector.
+  $drawer_options = array();
+
   // loop through the form and start pulling out the data to
   // create tabs -> panes -> drawers
   foreach($resources as $tab_name => $data) {
@@ -600,6 +608,8 @@ function media_build_browser_form($registration_ids, $node_type, $field, $uid) {
       '#title' => $tab_name,
       '#theme' => 'media_browser_pane',
     );
+
+    $drawer_options[$tab_id] = $tab_name;
 
     // build the drawers for this tab
     $drawer_list = array();
@@ -625,6 +635,8 @@ function media_build_browser_form($registration_ids, $node_type, $field, $uid) {
 
         // no longer on the first drawer
         $active_drawer = FALSE;
+
+        $drawer_options[$tab_id .'|'. $drawer_id] = '- '. $drawer_name;
       }
       // change the drawers to a list for easer display
       $form['media_browser'][$tab_id]['drawers'] = array(
@@ -634,6 +646,15 @@ function media_build_browser_form($registration_ids, $node_type, $field, $uid) {
 
     }
   }
+
+  $form['media_browser']['drawer_select'] = array(
+    '#type' => 'select',
+    '#title' => t('Drawer select'),
+    '#description' => t('Oh bother, you really should have JavaScript enabled, you know...'),
+    '#options' => $drawer_options,
+    '#prefix' => '<div class="media-browser-drawer-select">',
+    '#suffix' => '</div>',
+  );
 
   // Container for the progress indicator.
   $form['media_browser']['media_browser_file_progress'] = array(
@@ -664,6 +685,16 @@ function media_build_browser_form($registration_ids, $node_type, $field, $uid) {
     ),
   );
 
+  // Container for the metadata submission message.
+  $form['media_browser']['media_browser_metadata_message'] = array(
+    '#prefix' => '<div id="media-browser-metadata-message-'. $id .'" class="media-browser-metadata-message">',
+    '#suffix' => '</div>',
+  );
+  $form['media_browser']['media_browser_metadata_message']['message'] = array(
+    '#type' => 'item',
+    '#value' => '',
+  );
+
   $form['media_browser']['media_browser_metadata'] = array(
     '#type' => 'tabset',
     '#attributes' => array('class' => 'media-browser-metadata-wrapper'),
@@ -679,6 +710,25 @@ function media_build_browser_form($registration_ids, $node_type, $field, $uid) {
       '#title' => t('Title'),
     );
   }
+
+  // Our AHAH enabled submit button for the metadata.
+  $form['media_browser']['media_browser_metadata_submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Add metadata'),
+    '#description' => t("Add the selected file."),
+    '#submit' => array('media_browser_metadata_submit'), // If no javascript action.
+    '#validate' => array('media_browser_metadata_validate'),
+    '#attributes' => array('class' => 'media-browser-metadata-submit'),
+    '#ahah' => array(
+      'path' => 'media/metadata/js',
+      'wrapper' => 'media-browser-metadata-message-'. $id,
+      'method' => 'replace',
+      'effect' => 'fade',
+      // The FAPI docs say a submit element defaults to 'click',
+      // but as of d6.10, it defaults to 'mousedown', so we need to specify.
+      'event' => 'click',
+    ),
+  );
 
   // build the tabs into a single form element
   // @TODO make sure we have children for each tab and remove any that
@@ -838,6 +888,14 @@ function media_file_list_element_submit($form, $form_state) {
 function media_file_list_element_validate($element, $form_state) {
   drupal_set_message('Successful validation of the Media File List...');
   return $element;
+}
+
+function media_browser_metadata_validate(&$form, $form_state) {
+  drupal_set_message('validating metadata...');
+}
+
+function media_browser_metadata_submit(&$form, $form_state) {
+  drupal_set_message('last step... we now have metadata!');
 }
 
 function media_browser_validate(&$form, $form_state) {

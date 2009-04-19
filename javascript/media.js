@@ -56,6 +56,12 @@ Drupal.behaviors.mediaBrowserHide = function (context) {
   // Hide our file progress indicators.
   $('.media-browser-file-progress:not(.mediaBrowserHide-processed)', context).addClass('mediaBrowserHide-processed').attr('style', 'display:none');
   $('.media-browser-metadata-wrapper:not(.mediaBrowserHide-processed)', context).addClass('mediaBroswerHide-processed').hide();
+  $('.media-browser-drawer-select:not(.mediaBrowserHide-processed)', context).addClass('mediaBroswerHide-processed').attr('style', 'display:none');
+  $('.media-browser-metadata-submit:not(.mediaBrowserHide-processed)', context).addClass('mediaBroswerHide-processed').attr('style', 'display:none').each(function() {
+    $(this).click(function() {
+      $(this).hide().siblings('.media-browser-metadata-wrapper').slideUp();
+    });
+  });
 
   // Add behavior to our big red activation button.
   $('.media.browser.activation:not(.mediaBrowserHide-processed)', context).addClass('mediaBrowserHide-processed').each(function () {
@@ -86,8 +92,9 @@ Drupal.behaviors.mediaAhahHideBrowser = function (context) {
   $('.media-browser-submit:not(.mediaAhahHideBrowser-processed)', context).addClass('mediaAhahHideBrowser-processed').each(function() {
     $(this).bind('click', function() {
       $(this).hide().siblings('.ui-tabs-panel, ul').slideUp();
-      $(this).prev('.media-browser-file-progress').show();
-      $(this).next('.media-browser-metadata-wrapper').show();
+      $(this).siblings('.media-browser-file-progress').show();
+      $(this).siblings('.media-browser-metadata-wrapper').show();
+      $(this).siblings('.media-browser-metadata-submit').show();
     });
   });
 };

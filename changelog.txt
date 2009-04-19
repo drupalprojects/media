@@ -2,6 +2,9 @@
 
 April 2009
 ----------
+ * Create metadata mockup (aaron).
+ * Add metadata submission & drupal behaviors (aaron).
+ * Clean tab names w/ check_plain (aaron).
  * Begin creating metadata form (aaron).
  * Add file attached successful image (aaron).
  * Add file progress spinner images (aaron).
