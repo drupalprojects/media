@@ -2,6 +2,7 @@
 
 April 2009
 ----------
+ * Add file attached successful image (aaron).
  * Add file progress spinner images (aaron).
  * Hide our file progress indicators (aaron).
  * Documenting Drupal.behaviors.mediaBrowserHide behavior (aaron).

@@ -642,7 +642,7 @@ function media_build_browser_form($registration_ids, $node_type, $field, $uid) {
   );
   $form['media_browser']['media_browser_file_progress']['file_progress_message'] = array(
     '#type' => 'item',
-    '#title' => t('!image @progress', array('!image' => theme('image', variable_get('media_file_progress_image', $path .'/images/uploading-gradient.gif')), '@progress' => variable_get('media_file_progress_message', t('Please wait while your file is attached...')))),
+    '#title' => theme('image', variable_get('media_file_progress_image', $path .'/images/uploading-gradient.gif')) . t('Please wait while your file is attached...'),
   );
 
   // Our AHAH enabled submit button.
@@ -825,5 +825,5 @@ function media_file_list_element_validate($element, $form_state) {
 }
 
 function media_browser_submit(&$form, $form_state) {
-  drupal_set_message('media_browser_submit');
+  drupal_set_message(theme('image', variable_get('media_file_progress_success', drupal_get_path('module', 'media') .'/images/check-green-blah.png')) . t('File attachment successful.'));
 }
