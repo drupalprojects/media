@@ -2,6 +2,7 @@
 
 April 2009
 ----------
+ * Documenting Drupal.behaviors.mediaBrowserHide behavior (aaron).
  * Move button/progress out of loop and back into browser (aaron).
  * Store progress message in a variable (aaron).
  * Move button/progress out of browser (aaron).

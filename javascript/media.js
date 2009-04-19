@@ -53,17 +53,18 @@ Drupal.behaviors.mediaDrawers = function (context) {
  *  form, activate the add button, and hide the browser.
  */
 Drupal.behaviors.mediaBrowserHide = function (context) {
-  $('.media.browser.wrapper:not(.mediaBrowserHide-processed)', context).addClass('mediaBrowserHide-processed').hide();
+  // Hide our file progress indicators.
+  $('.media-browser-file-progress:not(.mediaBrowserHide-processed)', context).addClass('mediaBrowserHide-processed').hide();
+
+  // Add behavior to our big red activation button.
   $('.media.browser.activation:not(.mediaBrowserHide-processed)', context).addClass('mediaBrowserHide-processed').each(function () {
+    // Hide the browser associated with this button.
     $(this).next('.media.browser').hide();
     $(this).click(function () {
-      $(this).next('.media.browser').slideDown('slow').next('.media-browser-submit').slideDown('slow');
+      // When clicking, show the browser and hide this button.
+      $(this).next('.media.browser').slideDown('slow');
       $(this).slideUp();
     });
-  });
-  // Hide our file progress indicators.
-  $('.media-browser-file-progress:not(.mediaBrowserHide-processed)', context).addClass('mediaBrowserHide-processed').each(function() {
-    $(this).hide();
   });
 };
 
