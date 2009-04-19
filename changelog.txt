@@ -2,6 +2,7 @@
 
 April 2009
 ----------
+ * Hide our file progress indicators (aaron).
  * Documenting Drupal.behaviors.mediaBrowserHide behavior (aaron).
  * Move button/progress out of loop and back into browser (aaron).
  * Store progress message in a variable (aaron).
