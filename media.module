@@ -580,7 +580,7 @@ function media_build_browser_form($registration_ids, $node_type, $field, $uid) {
     '#value' => '<div class="media browser activation">'. t('Add files') .'</div>',
   );
 
-  // we are using a tab form type
+  // We are using a tab form type.
   $form['media_browser'] = array(
     '#type' => 'tabset',
     '#attributes' => array('class' => 'media browser wrapper'),
@@ -633,17 +633,17 @@ function media_build_browser_form($registration_ids, $node_type, $field, $uid) {
       );
 
       // Container for the progress indicator.
-      $form['media_browser']['media_browser_file_progress'] = array(
+      $form['media_browser_file_progress'] = array(
         '#prefix' => '<div id="media-browser-file-progress-'. $id .'">',
         '#suffix' => '</div>',
       );
-      $form['media_browser']['media_browser_file_progress']['test'] = array(
+      $form['media_browser_file_progress']['test'] = array(
         '#type' => 'item',
         '#title' => t('Test... File progress will go here...'),
       );
 
       // Our AHAH enabled submit button.
-      $form['media_browser']['media_browser_submit'] = array(
+      $form['media_browser_submit'] = array(
         '#type' => 'submit',
         '#value' => t('Add file'),
         '#description' => t("Add the selected file."),
