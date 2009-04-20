@@ -184,7 +184,7 @@ function media_get_registered_modules($ids = NULL, $reset = FALSE) {
   // Only build cache the first time the function is called, or if we reset it.
   if (is_NULL($registrations) || $reset) {
     $registrations = array();
-    // Get all the modules which implement media_register().
+    // Get all the modules which implement hook_media_register().
     foreach (module_implements('media_register') as $module) {
       $function = $module .'_media_register';
       // Get all the registrations defined by the module.
@@ -347,7 +347,7 @@ function media_get_registration_kinds($kind = NULL) {
 
 /**
  * Returns a set of formatters which can format the specified item. If
- * $description is NULL, all formatters will be returned. If a set of
+ * $description is NULL, all formatters will be returned. A set of
  * registered modules can be passed in to narrow the formatter options.
  * @param string $description
  *   File extension to return.
@@ -364,7 +364,7 @@ function media_registration_item_formatters($description = '*', $registrations =
   }
   // Iterate through each of the registered modules and find the formatters.
   foreach ($registrations as  $id => $registration) {
-    // look for the formatter, or just take all
+    // Look for the formatter, or just take all (wildcard being *).
     if ((is_array($registration['kind']['formatter']['types']) && in_array($registration['kind']['formatter']['types'], $description))
       || $description == '*'
       || $registration['kind']['formatter']['types'] == '*') {
@@ -700,6 +700,35 @@ function media_build_browser_form($registration_ids, $node_type, $field, $uid) {
     '#attributes' => array('class' => 'media-browser-metadata-wrapper'),
   );
 
+  // @TODO: This all goes in the form creation, actually,
+  // to create our metadata form...
+//   $uri = $form_state['values']['media_files'];
+//   $file_extension = pathinfo($uri, PATHINFO_EXTENSION);
+//
+//   // Get the file creator for this item.
+//   $file_creator = media_get_registered_modules(array($registration_id));
+//
+//   // Get the formaters for this node type.
+//   $formatters = media_active_fields_for_node_type($node_type, 'formatter');
+//
+//   // Get the registrations.
+//   $registrations = media_get_registered_modules($formatters[$field]);
+//
+//   // Remove any non-applying registrations.
+//   $registrations = media_get_applicable_formatters($registrations, $file_extension);
+//
+//   // Get all the formatting forms.
+//   $formatter_options = array();
+//   $forms = array();
+//   foreach ($registrations as $id => $registration) {
+//     $formatter_options[$id] = $registration['name'];
+//     $function = $registration['callbacks']['form'];
+//     if (function_exists($function)) {
+//       $forms[$id] = $function($node_type, $field, $file_extension, $uri);
+//     }
+//   }
+
+  // @TODO: This is placeholder only.
   foreach (array('Video', 'Image', 'Audio', 'PDF') as $mime_type) {
     $form['media_browser']['media_browser_metadata'][$mime_type] = array(
       '#type' => 'tabpage',
@@ -907,31 +936,5 @@ function media_browser_submit(&$form, $form_state) {
   drupal_set_message('(media_browser_submit will need to actually process the file here.)');
 //   dpm($form_state['values']);
 
-  // @TODO: This all goes in the form creation, actually,
-  // to create our metadata form...
-  $uri = $form_state['values']['media_files'];
-  $file_extension = pathinfo($uri, PATHINFO_EXTENSION);
 
-  // Get the file creator for this item.
-  $file_creator = media_get_registered_modules(array($registration_id));
-
-  // Get the formaters for this node type.
-  $formatters = media_active_fields_for_node_type($node_type, 'formatter');
-
-  // Get the registrations.
-  $registrations = media_get_registered_modules($formatters[$field]);
-
-  // Remove any non-applying registrations.
-  $registrations = media_get_applicable_formatters($registrations, $file_extension);
-
-  // Get all the formatting forms.
-  $formatter_options = array();
-  $forms = array();
-  foreach ($registrations as $id => $registration) {
-    $formatter_options[$id] = $registration['name'];
-    $function = $registration['callbacks']['form'];
-    if (function_exists($function)) {
-      $forms[$id] = $function($node_type, $field, $file_extension, $uri);
-    }
-  }
 }

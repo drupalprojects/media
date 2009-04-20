@@ -2,6 +2,7 @@
 
 April 2009
 ----------
+ * Minor documentation (aaron).
  * Create metadata mockup (aaron).
  * Add metadata submission & drupal behaviors (aaron).
  * Clean tab names w/ check_plain (aaron).
