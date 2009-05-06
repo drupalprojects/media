@@ -1,5 +1,9 @@
 // $Id$
 
+May 2009
+--------
+ * #454834/Rob Loach: Remove .project file (aaron/Rob Loach).
+
 April 2009
 ----------
  * Minor documentation (aaron).
