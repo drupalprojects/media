@@ -38,7 +38,7 @@ function media_ahah_formatter_load() { //$registration_id, $node_type, $field, $
 
   // Do whatever we need here for Step #9.
   // ...
-  drupal_set_message('hooray!');
+  drupal_set_message('media_ahah_formatter_load can add anything here (if necessary).');
 
   // Step #10: Output any drupal messages and the new form.
   $media_tabs = $form[$field]['media']['media_tabs'];

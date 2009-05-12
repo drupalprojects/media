@@ -928,12 +928,12 @@ function media_browser_metadata_submit(&$form, $form_state) {
 }
 
 function media_browser_validate(&$form, $form_state) {
-  drupal_set_message('validating...');
+  drupal_set_message('media_browser_validate is validating... needs to go to registered module from here.');
 }
 
 function media_browser_submit(&$form, $form_state) {
-  drupal_set_message(theme('image', variable_get('media_file_progress_success', drupal_get_path('module', 'media') .'/images/check-green-blah.png')) . t('File attachment: !file successful.', array('!file' => l($form_state['values']['media_files'], $form_state['values']['media_files']))));
-  drupal_set_message('(media_browser_submit will need to actually process the file here.)');
+  drupal_set_message(theme('image', variable_get('media_file_progress_success', drupal_get_path('module', 'media') .'/images/check-green-blah.png')) . t('media_browser_submit File attachment: !file successful.', array('!file' => l($form_state['values']['media_files'], $form_state['values']['media_files']))));
+  drupal_set_message('(media_browser_submit will need to actually process the file here, sending it to the original registered module to store. we also need to ensure the file is kept in synch with the metadata & formatter coming up next.)');
 //   dpm($form_state['values']);
 
 
