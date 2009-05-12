@@ -77,7 +77,7 @@ function media_ahah_metadata_ahah() {
 
   // Do whatever we need here for Step #9.
   // ...
-  drupal_set_message('final submission: media_ahah_metadata_ahah!');
+  drupal_set_message('final submission: media_ahah_metadata_ahah can do something here, maybe display a new add file form?');
 
   // Step #10: Output any drupal messages and the new form.
   $media_tabs = $form[$field]['media']['media_tabs'];

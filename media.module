@@ -920,11 +920,11 @@ function media_file_list_element_validate($element, $form_state) {
 }
 
 function media_browser_metadata_validate(&$form, $form_state) {
-  drupal_set_message('validating metadata...');
+  drupal_set_message('validating metadata... media_browser_metadata_validate needs to pass it to the registered module.');
 }
 
 function media_browser_metadata_submit(&$form, $form_state) {
-  drupal_set_message('last step... we now have metadata!');
+  drupal_set_message('media_browser_metadata_submit: last step... we now have metadata, and need to send that info to the registered module w/ the file info.');
 }
 
 function media_browser_validate(&$form, $form_state) {
