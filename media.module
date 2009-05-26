@@ -40,51 +40,16 @@ function media_menu() {
     'file' => 'media_ahah.inc',
   );
 
-  // Media configuration parent path.
-  $items['admin/content/media'] = array(
-    'title' => 'Media',
-    'description' => 'Configure your site\'s Media settings.',
-    'page callback' => 'media_admin_settings',
-    'access arguments' => array('administer media'),
-    'file' => 'media_admin.inc',
-  );
-
   // Default settings, for content types that do not have their own.
-  $items['admin/content/media/global'] = array(
-    'title' => 'Global and Default Media Settings',
-    'description' => 'Configure Global Media settings, including default content type settings',
+  $items['admin/settings/media'] = array(
+    'title' => 'Media settings',
+    'description' => 'Configure Global Media settings, including default content type settings.',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('media_admin_settings','global'),
+    'page arguments' => array('media_settings_global','global'),
     'access arguments' => array('administer media'),
-    'file' => 'media_admin.inc',
+    'file' => 'media_settings.inc',
     'weight' => 3,
   );
-
-  // Top-level page for content types, split off because it gets crowded.
-  $items['admin/content/media/types'] = array(
-    'title' => 'Content Type Settings',
-    'description' => 'Configure Media settings that are specific to a content type',
-    'page callback' => 'media_admin_settings',
-    'page arguments' => array('media_admin_settings','types'),
-    'access arguments' => array('administer media'),
-    'file' => 'media_admin.inc',
-  );
-
-  // Build pages for each content type.
-  $content_types = node_get_types();
-  if ($content_types) {
-    foreach ($content_types as $content_type) {
-      $items['admin/content/media/types/'. $content_type->type] = array(
-        'title' => $content_type->name,
-        'description' => 'Configure Media settings for '. $content_type->name,
-        'page callback' => 'drupal_get_form',
-        'page arguments' => array('media_admin_settings', $content_type->type),
-        'access arguments' => array('administer media'),
-        'file' => 'media_admin.inc',
-        'type' => MENU_CALLBACK,
-      );
-    }
-  }
 
   return $items;
 }
@@ -98,6 +63,14 @@ function media_menu() {
  */
 function media_form_alter(&$form, $form_state, $form_id) {
   global $user;
+  
+  // TODO: Refactor media_admin.inc to media_settings.inc
+  
+  // Load content-type settings
+  if ($form_id == 'node_type_form') {
+    include_once('media_settings.inc');
+    media_settings_content_type($form, $form['#node_type']->type);
+  }
 
   // Add the media browser on the node add/edit screen.
   if (strstr($form_id, 'node_form') ) {
@@ -469,7 +442,7 @@ function media_get_resources($registration_ids, $node_type, $field, $uid) {
  *   An array of field names.
  */
 function media_active_fields_for_node_type($type_name, $function = 'resource') {
-  //@TODO: Some of this code is redundant with media_admin_settings
+  //@TODO: Some of this code is redundant with media_settings_global
   if (module_exists('content')) {
     $type = content_types($type_name);
   }

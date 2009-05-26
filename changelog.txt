@@ -4,7 +4,11 @@ May 2009
 --------
  * Debugging messages (aaron).
  * #454834/Rob Loach: Remove .project file (aaron/Rob Loach).
-
+ * #469220: Revise menu item locations (jmstacey).
+    * Global settings moved to site configuration (admin/settings).
+    * Content type settings moved to the content type edit page as a new fieldset (admin/content/node-type/*).
+    * Code refactoring: media_admin.inc renamed to media_settings.inc.
+ 
 April 2009
 ----------
  * Minor documentation (aaron).
