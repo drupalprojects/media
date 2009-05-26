@@ -64,8 +64,6 @@ function media_menu() {
 function media_form_alter(&$form, $form_state, $form_id) {
   global $user;
   
-  // TODO: Refactor media_admin.inc to media_settings.inc
-  
   // Load content-type settings
   if ($form_id == 'node_type_form') {
     include_once('media_settings.inc');
@@ -87,6 +85,7 @@ function media_form_alter(&$form, $form_state, $form_id) {
 
       // Iterate through each field and add a browser form.
       foreach ($fields as $field => $registration_ids) {
+        
         // Add the media browser form.
         $form[$field]['media'] = media_build_browser_form($registration_ids, $form['type']['#value'], $field, $user->uid);
 
@@ -430,7 +429,6 @@ function media_get_resources($registration_ids, $node_type, $field, $uid) {
   return $items;
 }
 
-
 /**
  * Get a list of fields for the requested node type.
  *
@@ -442,42 +440,26 @@ function media_get_resources($registration_ids, $node_type, $field, $uid) {
  *   An array of field names.
  */
 function media_active_fields_for_node_type($type_name, $function = 'resource') {
-  //@TODO: Some of this code is redundant with media_settings_global
-  if (module_exists('content')) {
-    $type = content_types($type_name);
-  }
-  else {
-    // Get the specific content type.
-    $type = (array) node_get_types('type', $type_name);
-  }
-  // Add the upload form as a type of faux field.
-  if (is_array($type['extra']['attachments'])) {
-    $type['fields']['attachments'] = array(
-      'field_name' => 'attachments',
-      'type' => 'attachments',
-      'widget' => array(
-        'label' => $type['extra']['attachments']['label'],
-      ),
-    );
-  }
-
   // Need to know if the type-specific or global settings are going to be used.
   // At least one of them is enabled at this point.
   $type_override = variable_get('media_'. $type_name .'_override', FALSE);
 
-  $items = array();
+  $items  = array();
+  $type   = _media_content_field_types($type_name);
   // extract the fields for this node type
   foreach ((array)$type['fields'] as $field_name => $field) {
     // Ignore the content-type specific per-field setting unless the override is set
     $fields_enabled = FALSE;
+    
     if ($type_override) {
-      $fields_enabled = variable_get('media_'. $type_name .'_'. $field['field_name'] .'_'. $function,FALSE);
+      $fields_enabled = variable_get('media_'. $type_name .'_'. $field['field_name'] .'_'. $function, FALSE);
     }
     else {
       //@TODO: Right now, if it's using the default it will be enabled for all fields.
       // Eventually it will probably be better to allow per-field controls at a global level as well.
       // However, this line will probably just work once the actual variables exist.
       $fields_enabled = variable_get('media_global_'. $field['field_name'] .'_'. $function,'default');
+      
       // Handle the default special, because we want the default to be on for all fields but don't know what the fields are yet.
       if ($fields_enabled === 'default') {
         $fields_enabled = array();
@@ -492,11 +474,12 @@ function media_active_fields_for_node_type($type_name, $function = 'resource') {
         }
       }
     }
+    
     if (!empty($fields_enabled)) {
       $items[] = $fields_enabled;
     }
   }
-
+  
   $data = array();
   foreach ($items as $item) {
     foreach ($item as $id => $value) {
@@ -506,10 +489,9 @@ function media_active_fields_for_node_type($type_name, $function = 'resource') {
         $data[$id[0]][] = $id[1];
       }
     }
-  }
+  }  
   return $data;
 }
-
 
 /**
  * Sanitize the incoming name to be used for a html #id.
@@ -908,6 +890,36 @@ function media_browser_submit(&$form, $form_state) {
   drupal_set_message(theme('image', variable_get('media_file_progress_success', drupal_get_path('module', 'media') .'/images/check-green-blah.png')) . t('media_browser_submit File attachment: !file successful.', array('!file' => l($form_state['values']['media_files'], $form_state['values']['media_files']))));
   drupal_set_message('(media_browser_submit will need to actually process the file here, sending it to the original registered module to store. we also need to ensure the file is kept in synch with the metadata & formatter coming up next.)');
 //   dpm($form_state['values']);
+}
 
+/**
+ * Get a list of content field types using CCK if available.
+ *
+ * @param string $type_name
+ *  A string representing the content type.
+ * @return array
+ *  A form structured array is returned.
+ */
+function _media_content_field_types($type_name) {
+  if (module_exists('content')) {
+    $type = content_types($type_name);
+  }
+  else {
+    // Get the specific content type.
+    $type = (array)node_get_types('type', $type_name);
+  }
+  
+  // Recognize the upload/attachment form and create an artificial field.
+  // This should be the only one we ever have to do this for.
+  if (module_exists('upload')) {  
+    $type['fields']['attachments'] = array(
+      'field_name'  => 'attachments',
+      'type'        => 'attachments',
+      'widget'      => array(
+        'label'       => $type['extra']['attachments']['label'],
+      ),
+    );
+  }
 
+  return $type;
 }

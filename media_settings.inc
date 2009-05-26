@@ -8,14 +8,14 @@
  */
 
 /**
- * Provides per content type settings.
+ * Provide per content type settings.
  *
- * @param &form
- *  A reference to an existing form array.
- * @param $type_name
+ * @param array reference &form
+ *  A reference to an existing form structured array.
+ * @param string $type_name
  *  A string representing the content type.
  * @return
- *  nothing is returned.
+ *  Nothing is returned.
  */
 function media_settings_content_type(&$form, $type_name = null) {
   $form['media'] = array(
@@ -25,15 +25,7 @@ function media_settings_content_type(&$form, $type_name = null) {
     '#collapsed'    => 'true',
   );
   
-  // Specific content type settings. Use CCK if available.
-  // TODO: Nothing is showing up if content is not available (#469214).
-  if (module_exists('content')) {
-    $type = content_types($type_name);
-  }
-  else {
-    // Get the specific content type.
-    $type = (array)node_get_types('type', $type_name);
-  }
+  $type = _media_content_field_types($type_name);
 
   // Master settings override.
   $form['media']['media_'. $type_name .'_override'] = array(
@@ -49,19 +41,8 @@ function media_settings_content_type(&$form, $type_name = null) {
     '#default_value' => variable_get('media_'. $type_name .'_enabled', null),
   );
   
-  // Add the upload form as a type of faux field.
-  if (is_array($type['extra']['attachments'])) {
-    $type['media']['fields']['attachments'] = array(
-      'field_name' => 'attachments',
-      'type' => 'attachments',
-      'widget' => array(
-        'label' => $type['extra']['attachments']['label'],
-      ),
-    );
-  }
-  
   // Extract the fields for this node type
-  foreach ((array)$type['media']['fields'] as $field_name => $field) {
+  foreach ((array)$type['fields'] as $field_name => $field) {
     // Create the field identifier
     $form['media'][$field['field_name']] = array(
       '#type' => 'fieldset',
@@ -96,13 +77,13 @@ function media_settings_content_type(&$form, $type_name = null) {
 }
 
 /**
- * Provides global settings.
+ * Provide global settings.
  *
- * @param form
+ * @param array $form
  *  A form structure.
- * @param $type_name
+ * @param string $type_name
  *  Content type name.
- * @return
+ * @return array
  *  A form structure.
  */
 function media_settings_global($form = array(), $type_name = null) {

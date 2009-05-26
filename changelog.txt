@@ -8,6 +8,9 @@ May 2009
     * Global settings moved to site configuration (admin/settings).
     * Content type settings moved to the content type edit page as a new fieldset (admin/content/node-type/*).
     * Code refactoring: media_admin.inc renamed to media_settings.inc.
+ * #469214: CCK Requirement (jmstacey).
+    * CCK is no longer required for media_upload. 
+    * _media_content_field_types() added to remove redundant code.
  
 April 2009
 ----------
