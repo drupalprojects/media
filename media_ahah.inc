@@ -2,6 +2,13 @@
 // $Id$
 
 /**
+ * @file
+ * Media AHAH
+ *
+ * AHAH functions for the Media module.
+ */
+
+/**
  *  This function builds the form elements for the file formater based
  *  on the node type and field for settings and the file extension to get the
  *  formatters.

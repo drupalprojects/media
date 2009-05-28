@@ -1,6 +1,6 @@
 ; $Id$
 
-name = Media API Module
+name = Media API
 description = Provides core media api
 package = "Media"
 core = 6.x
