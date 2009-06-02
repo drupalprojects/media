@@ -16,56 +16,50 @@
 */
 function media_upload_media_register() {
   $items = array();
-  $items['media_upload_resource'] = array(
-    'name' => 'Media Upload resource',
-    'description' => t("Provides integration with Drupal's Upload module"),
-    'kind' => 'resource',
-    // function to invoke when data is needed from this
-    'callbacks' => array(
-      'resource' => 'media_upload_media_user_files_select',
+  $items['media_upload_resource_add_file'] = array(
+    'name'        => 'Media Upload add file',
+    'description' => t("Add new file using Drupal's Upload module"),
+    'kind'        => 'resource',
+    'callbacks'   => array(
+      'resource'    => 'media_upload_resource_add_file',
     ),
-    // cck field types that this works on
-    'fields' => array('attachments', 'filefield'),
+    'fields'      => array('attachments', 'filefield'),
   );
   
-  $items['media_upload_display'] = array(
-    'name' => 'Media Drupal Upload display FORMATTER',
-    'description' => "Provides integration with Drupal's Upload module",
-      'kind' => 'formatter',
-      'callbacks' => array(
-        'form' => 'media_upload_formatter_form',
-      ),
-      'fields' => array('attachments', 'filefield'),
-    );
-    
-  $items['media_upload_display2'] = array(
-    'name' => 'Media Drupal Upload display',
-    'description' => t("Provides integration with Drupal's Upload module"),
-    'uri' => 'file',
-    'kind' => 'resource',
-    'types' => '*',
-    'callbacks' => array(
-      'resource' => 'media_upload_media_user_files_select2',
+  $items['media_upload_resource_embed_file'] = array(
+    'name'        => 'Media Upload embed file',
+    'description' => t("Embed file URI using Drupal's Upload module"),
+    'uri'         => 'file',
+    'kind'        => 'resource',
+    'types'       => '*',
+    'callbacks'   => array(
+      'resource'    => 'media_upload_resource_embed_file',
      ),
-    'fields' => array('attachments', 'filefield'),
+    'fields'      => array('attachments', 'filefield'),
   );
   
-  // $items['media_upload_attach'] = array(
-  //   'name' => 'Media Drupal Upload attacher',
-  //   'description' => t("Provides integration with Drupal's Upload module"),
-  //   'kind' => 'process',
-  //   'types' => '*',
-  //   'callbacks' => array(
-  //     'resource' => 'media_upload_media_process',
-  //    ),
-  //   'fields' => array('attachments', 'filefield'),
-  // );
+  $items['media_upload_formatter_form'] = array(
+    'name'        => 'Media Upload form formatter',
+    'description' => "Media upload form formatter",
+    'kind'        => 'formatter',
+    'callbacks'   => array(
+      'form'        => 'media_upload_formatter_form',
+    ),
+    'fields'      => array('attachments', 'filefield'),
+    );
 
   return $items;
 }
 
 /**
- * TODO: Document
+ * Format Media Upload form
+ *
+ * @param string $node_type
+ * @param string $field
+ * @param string $file_extension
+ * @param string $uri
+ * @return array
+ *   Return a form array.
 */
 function media_upload_formatter_form($node_type, $field, $file_extension, $uri) {
   if ($uri) {
@@ -84,7 +78,7 @@ function media_upload_formatter_form($node_type, $field, $file_extension, $uri) 
 }
 
 /**
- * Implementation of hook_media_user_files_select
+ * Implementation of registration media_upload_resource_add_file
  *
  * @param string $node_type
  *   drupal node type
@@ -93,7 +87,7 @@ function media_upload_formatter_form($node_type, $field, $file_extension, $uri) 
  * @param int $uid
  *   user id
  */
-function media_upload_media_user_files_select($node_type, $field, $uid) {
+function media_upload_resource_add_file($node_type, $field, $uid) {
   return array(
     t('Add files') => array(
       t('New file') => media_resource_display_upload_form(),
@@ -102,16 +96,16 @@ function media_upload_media_user_files_select($node_type, $field, $uid) {
 }
 
 /**
- * Implementation of hook_media_user_files_select
+ * Implementation of registration media_upload_resource_embed_file
  *
  * @param string $node_type
  * @param string $field
  * @param int $uid
  */
-function media_upload_media_user_files_select2($node_type, $field, $uid) {
+function media_upload_resource_embed_file($node_type, $field, $uid) {
   return array(
     t('Add files') => array(
-      t('Embeded file') => media_upload_display_embed_form(),
+      t('Embeded file') => _media_upload_display_embed_form(),
     )
   );
 }
@@ -122,7 +116,7 @@ function media_upload_media_user_files_select2($node_type, $field, $uid) {
  * @return array
  *   Form array containing a textarea
  */
-function media_upload_display_embed_form() {
+function _media_upload_display_embed_form() {
   $form['media_upload']['upload'] = array(
     '#type' => 'textarea',
     '#title' => t('Upload your file'),
