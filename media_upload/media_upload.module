@@ -8,16 +8,17 @@
  */
 
 
- /**
-  * Implementation of hook_media_register
-  * @return
-  *   array
-  */
+/**
+ * Implementation of hook_media_register
+ *
+ * @return array
+ *   Form array items
+*/
 function media_upload_media_register() {
   $items = array();
   $items['media_upload_resource'] = array(
     'name' => 'Media Upload resource',
-    'description' => t('Provides integration with Drupal\'s Upload module'),
+    'description' => t("Provides integration with Drupal's Upload module"),
     'kind' => 'resource',
     // function to invoke when data is needed from this
     'callbacks' => array(
@@ -29,7 +30,7 @@ function media_upload_media_register() {
   
   $items['media_upload_display'] = array(
     'name' => 'Media Drupal Upload display FORMATTER',
-    'description' => 'Provides integration with Drupal\'s Upload module',
+    'description' => "Provides integration with Drupal's Upload module",
       'kind' => 'formatter',
       'callbacks' => array(
         'form' => 'media_upload_formatter_form',
@@ -38,9 +39,8 @@ function media_upload_media_register() {
     );
     
   $items['media_upload_display2'] = array(
-    // human readable name
     'name' => 'Media Drupal Upload display',
-    'description' => t('Provides integration with Drupal\'s Upload module'),
+    'description' => t("Provides integration with Drupal's Upload module"),
     'uri' => 'file',
     'kind' => 'resource',
     'types' => '*',
@@ -49,10 +49,24 @@ function media_upload_media_register() {
      ),
     'fields' => array('attachments', 'filefield'),
   );
+  
+  // $items['media_upload_attach'] = array(
+  //   'name' => 'Media Drupal Upload attacher',
+  //   'description' => t("Provides integration with Drupal's Upload module"),
+  //   'kind' => 'process',
+  //   'types' => '*',
+  //   'callbacks' => array(
+  //     'resource' => 'media_upload_media_process',
+  //    ),
+  //   'fields' => array('attachments', 'filefield'),
+  // );
 
   return $items;
 }
 
+/**
+ * TODO: Document
+*/
 function media_upload_formatter_form($node_type, $field, $file_extension, $uri) {
   if ($uri) {
     $form['display'] = array(
@@ -68,7 +82,6 @@ function media_upload_formatter_form($node_type, $field, $file_extension, $uri) 
 
   return $form;
 }
-
 
 /**
  * Implementation of hook_media_user_files_select
@@ -88,7 +101,6 @@ function media_upload_media_user_files_select($node_type, $field, $uid) {
   );
 }
 
-
 /**
  * Implementation of hook_media_user_files_select
  *
@@ -104,10 +116,11 @@ function media_upload_media_user_files_select2($node_type, $field, $uid) {
   );
 }
 
-
 /**
  * Display the upload form for the tab
- * @return string
+ *
+ * @return array
+ *   Form array containing a textarea
  */
 function media_upload_display_embed_form() {
   $form['media_upload']['upload'] = array(

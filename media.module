@@ -210,6 +210,7 @@ function media_get_registered_modules($ids = NULL, $reset = FALSE) {
  *  Build a list of possible registration types.
  *  'resource' handles building file resource lists.
  *  'formatter' displays a list of file resources for the file browser.
+ *  'attach' passes an FID to the registered module for handling.
  *
  *  @return array
  */
@@ -559,6 +560,10 @@ function _media_content_field_types($type_name) {
  *
  * @TODO Clean this form up and use a form theme function.
  *
+ * Note: The FAPI docs say a submit element event defaults to 'click',
+ * but as of d6.10, it defaults to 'mousedown', so we need to override.
+ *   'event' => 'click',
+ *
  * @param array $registration_ids
  *   Array of registrations to call.
  * @param string $node_type
@@ -683,8 +688,6 @@ function media_build_browser_form($registration_ids, $node_type, $field, $uid) {
       'wrapper' => 'media-browser-file-progress-'. $id,
       'method' => 'replace',
       'effect' => 'fade',
-      // The FAPI docs say a submit element defaults to 'click',
-      // but as of d6.10, it defaults to 'mousedown', so we need to specify.
       'event' => 'click',
     ),
   );
@@ -757,8 +760,6 @@ function media_build_browser_form($registration_ids, $node_type, $field, $uid) {
       'wrapper' => 'media-browser-metadata-message-'. $id,
       'method' => 'replace',
       'effect' => 'fade',
-      // The FAPI docs say a submit element defaults to 'click',
-      // but as of d6.10, it defaults to 'mousedown', so we need to specify.
       'event' => 'click',
     ),
   );
@@ -781,7 +782,8 @@ function media_build_browser_form($registration_ids, $node_type, $field, $uid) {
  *   array of (uri => uri, filename => filename, meta => array(key => value))
  * @param string $title
  *   option title argument
- * @return string
+ * @return array
+ *   Form array containing a select list populated with files.
  */
 function media_resource_display_user_files_form($files, $title = NULL) {
   // Pass files into options array.
@@ -797,13 +799,15 @@ function media_resource_display_user_files_form($files, $title = NULL) {
     '#attributes' => array('class' => 'resource select'),
     '#size' => variable_get('media_file_list_size', 10),
   );
+  
   return $form;
 }
 
 /**
  * Display the upload form for the tab.
  *
- * @return string
+ * @return array
+ *   Form array containing a file field.
  */
 function media_resource_display_upload_form() {
   $form['media_upload']['upload'] = array(
@@ -971,6 +975,6 @@ function media_browser_validate(&$form, $form_state) {
  */
 function media_browser_submit(&$form, $form_state) {
   drupal_set_message(theme('image', variable_get('media_file_progress_success', drupal_get_path('module', 'media') .'/images/check-green-blah.png')) . t('media_browser_submit File attachment: !file successful.', array('!file' => l($form_state['values']['media_files'], $form_state['values']['media_files']))));
-  drupal_set_message('(media_browser_submit will need to actually process the file here, sending it to the original registered module to store. we also need to ensure the file is kept in synch with the metadata & formatter coming up next.)');
+  drupal_set_message('(media_browser_submit will need to actually process the file here, sending it to the original registered module to store. we also need to ensure the file is kept in synch with the metadata & formatter coming up next.)');  
 //   dpm($form_state['values']);
 }

@@ -9,19 +9,20 @@
  */
 
 /**
- *  This function builds the form elements for the file formater based
- *  on the node type and field for settings and the file extension to get the
- *  formatters.
- *  @param string $registration_id
- *    The id of the registration creating this formatter.
- *  @param string $node_type
- *    The kind of node.
- *  @param string $field
- *    The machine name of the field being operated on.
- *  @param string $uri
- *    (optional) The uri to the item, or file://path if it is being uploaded.
- *  @param string $file_extension
- *    (optional) The kind of file that will be operated on.
+ * This function builds the form elements for the file formater based
+ * on the node type and field for settings and the file extension to get the
+ * formatters.
+ *
+ * @param string $registration_id
+ *   The id of the registration creating this formatter.
+ * @param string $node_type
+ *   The kind of node.
+ * @param string $field
+ *   The machine name of the field being operated on.
+ * @param string $uri
+ *   (optional) The uri to the item, or file://path if it is being uploaded.
+ * @param string $file_extension
+ *   (optional) The kind of file that will be operated on.
  */
 function media_ahah_formatter_load() { //$registration_id, $node_type, $field, $uri = NULL, $file_extension = NULL) {
   // The form is generated in an include file which we need to include manually.
@@ -62,6 +63,9 @@ function media_ahah_formatter_load() { //$registration_id, $node_type, $field, $
   ));
 }
 
+/**
+ * TODO: Document
+ */
 function media_ahah_metadata_ahah() {
   // The form is generated in an include file which we need to include manually.
   include_once 'modules/node/node.pages.inc';
