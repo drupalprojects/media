@@ -1,5 +1,9 @@
 // $Id$
 
+June 2009
+--------
+ * An experimental addition of hook_media_action (jmstacey).
+
 May 2009
 --------
  * Debugging messages (aaron).

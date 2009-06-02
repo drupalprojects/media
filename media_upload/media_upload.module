@@ -43,10 +43,21 @@ function media_upload_media_register() {
     'description' => "Media upload form formatter",
     'kind'        => 'formatter',
     'callbacks'   => array(
-      'form'        => 'media_upload_formatter_form',
+      'formatter'        => 'media_upload_formatter_form',
     ),
     'fields'      => array('attachments', 'filefield'),
     );
+  
+  $items['media_upload_action'] = array(
+    'name'        => 'Media Upload action handler',
+    'description' => t("Called to perform various actions such as attaching a file to a node"),
+    'kind'        => 'action',
+    'types'       => '*',
+    'callbacks'   => array(
+      'action'      => 'media_upload_action',
+     ),
+    'fields'      => array('attachments', 'filefield'),
+  );
 
   return $items;
 }
@@ -122,4 +133,17 @@ function _media_upload_display_embed_form() {
     '#title' => t('Upload your file'),
    );
    return $form;
+}
+
+/**
+ * Implementation of hook_media_action
+ *
+ * TODO: Implement and document
+ */
+function media_upload_media_action(&$form, $form_state, $op = '') {
+  dsm("In the Media Upload action handler. Implement switch and carry out tasks.");
+  dsm($op);
+  dsm($form_state);
+  dsm($form);
+  
 }
