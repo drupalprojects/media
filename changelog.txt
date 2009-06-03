@@ -3,6 +3,7 @@
 June 2009
 --------
  * An experimental addition of hook_media_action (jmstacey).
+ * #480146: Move Media Hook Implementations out of media.module (jmstacey).
 
 May 2009
 --------

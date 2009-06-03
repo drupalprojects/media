@@ -784,7 +784,9 @@ function media_build_browser_form($registration_ids, $node_type, $field, $uid) {
 }
 
 /**
- * Display files in a form element. Default for other modules to make use of.
+ * Display files in a form element. 
+ * 
+ * This is a generic for other modules to make use of.
  *
  * @param array $files
  *   array of (uri => uri, filename => filename, meta => array(key => value))
@@ -796,9 +798,12 @@ function media_build_browser_form($registration_ids, $node_type, $field, $uid) {
 function media_resource_display_user_files_form($files, $title = NULL) {
   // Pass files into options array.
   $options = array();
+
   foreach ($files as $file) {
+		// TODO: Use FID rather than URI
     $options[$file['uri']] = $file['filename'];
   }
+
   // Parse files into form element.
   $form['media_files'] = array(
     '#type' => 'select',
@@ -834,58 +839,6 @@ function media_resource_display_upload_form() {
 /* ***************************************** */
 
 /**
- * Implementation of hook_media_register().
- *
- * @return array
- *   Returns the registration.
- */
-function media_media_register() {
-  $registration = array(
-    'media_user_files' => array(
-      'name'        => t('User files'),
-      'uri'         => 'file',
-      'kind'        => 'resource',
-      'types'       => '*',
-      'description' => t('Format Drupal uploaded files.'),
-      'callbacks'   => array(
-        'resource'  => 'media_display_user_files',
-      ),
-      'description' => t("Displays all of current user's files."),
-      'fields'      => array('attachments', 'filefield'),
-    )
-  );
-  
-  return $registration;
-}
-
-/**
- * Implementation of hook_media_user_files_select().
- *
- * @TODO move this to a specific module rather than the core module
- *
- * @param string $node_type
- * @param string $field
- * @param int $uid
- */
-function media_display_user_files($node_type, $field, $uid) {
-  $files = array();
-  $results = db_query('SELECT filepath, filename FROM {files} WHERE uid = %d', $uid);
-  while ($file = db_fetch_array($results)) {
-    $files[] = array(
-      'uri' => $file['filepath'],
-      'filename' => $file['filename'],
-      'meta' => '',
-    );
-  }
-  $return = array(
-    t('My files') => array(
-      t('Local') => media_resource_display_user_files_form($files, t('Your files')),
-    )
-  );
-  return $return;
-}
-
-/**
  *  Implementation of hook_media_elements().
  *
  *  A Media File List element is created with the following FAPI:
@@ -896,14 +849,20 @@ function media_display_user_files($node_type, $field, $uid) {
  */
 function media_elements() {
   $elements = array();
+  
   $elements['media_file_list'] = array(
-    '#input' => TRUE,
-    '#process' => array('media_file_list_element_process'),
+    '#input'            => TRUE,
+    '#process'          => array('media_file_list_element_process'),
     '#element_validate' => array('media_file_list_element_validate'),
-    '#submit' => array('media_file_list_element_submit'),
+    '#submit'           => array('media_file_list_element_submit'),
   );
+  
   return $elements;
 }
+
+/* ***************************************** */
+/* Callbacks                                 */
+/* ***************************************** */
 
 /**
  * Process callback for the media_browser element.
@@ -916,10 +875,11 @@ function media_elements() {
  */
 function media_file_list_element_process($element, $edit, $form_state, $form) {
   $element['list'] = array(
-    '#type' => 'select',
-    '#options' => $element['#options'],
-    '#size' => variable_get('media_file_list_size', 10),
+    '#type'     => 'select',
+    '#options'  => $element['#options'],
+    '#size'     => variable_get('media_file_list_size', 10),
   );
+  
   return $element;
 }
 
@@ -1000,7 +960,7 @@ function media_browser_submit(&$form, $form_state) {
     $hook_media_action($form, $form_state, 'media_browser_submit');
   }
   else {
-    drupal_set_message('Media: No action handler found'. $hook_media_action, 'error');
+    drupal_set_message(t('Media: No action handler found.'), 'error');
   }
   
   // dsm($form_state['values']);
