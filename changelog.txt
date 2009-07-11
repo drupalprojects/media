@@ -1,5 +1,9 @@
 // $Id$
 
+July 2009
+---------
+ * Add $form_state when building the metadata form (aaron).
+
 June 2009
 --------
  * An experimental addition of hook_media_action (jmstacey).
@@ -14,10 +18,10 @@ May 2009
     * Content type settings moved to the content type edit page as a new fieldset (admin/content/node-type/*).
     * Code refactoring: media_admin.inc renamed to media_settings.inc.
  * #469214: CCK Requirement (jmstacey).
-    * CCK is no longer required for media_upload. 
+    * CCK is no longer required for media_upload.
     * _media_content_field_types() added to remove redundant code.
  * Code cleanup based on recommendations from coder (and personal pet peeves) (jmstacey).
- 
+
 April 2009
 ----------
  * Minor documentation (aaron).
