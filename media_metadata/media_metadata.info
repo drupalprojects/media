@@ -1,4 +1,3 @@
-; $Id$
 
 name = Media Metadata
 description = Provides metadata integration with the Media module.

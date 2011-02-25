@@ -1,4 +1,3 @@
-; $Id$
 name = Resource
 description = A stream wrapper enabled replacement for core filehandling.
 package = Media

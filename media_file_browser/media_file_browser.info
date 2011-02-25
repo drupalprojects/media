@@ -1,4 +1,3 @@
-; $Id$
 
 name = Media File Browser Module
 description = Provides file browsing selection for the Media Module

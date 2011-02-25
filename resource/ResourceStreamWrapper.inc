@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /**
  * Generic PHP stream wrapper interface.

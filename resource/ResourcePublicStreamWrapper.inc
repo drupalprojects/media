@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /**
  * public:// stream wrapper class.

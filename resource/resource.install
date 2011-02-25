@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 function resource_install() {
   drupal_install_schema('resource');

@@ -1,4 +1,3 @@
-// $Id$
 
 /** Changelog for media_upload.module **/
 

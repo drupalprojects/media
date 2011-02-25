@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /**
  * The StreamWrapperManager provides a class for managing and querying
