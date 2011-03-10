@@ -16,7 +16,7 @@ require_once dirname(__FILE__) . '/media.pages.inc';
  */
 function media_admin($form, $form_state) {
   global $user;
-  
+
   $path = drupal_get_path('module', 'media');
 
   $form['#attached'] = array(
@@ -31,7 +31,7 @@ function media_admin($form, $form_state) {
 
   require_once dirname(__FILE__) . '/media.browser.inc';
   media_attach_browser_js($form);
-  
+
   $types = media_display_types();
 
   if (arg(3)) {
@@ -159,7 +159,7 @@ function media_admin_thumbnails() {
 
   $query->pager($limit);
   $query->entityCondition('entity_type', 'media');
-  
+
   $result = $query->execute();
   $ids = key_exists('media', $result) ? array_keys($result['media']) : FALSE;
   if ($ids) {
@@ -343,7 +343,7 @@ function media_admin_type_manage_form($form, &$form_state, $media_type) {
     '#type' => 'value',
     '#value' => $media_type->name,
   );
-  
+
   // If this Media type is handled by us, then we can put in some default
   // options. Otherwise, we leave it to the implementing module to form_alter.
   if ($media_type->type_callback == 'media_is_type') {
@@ -656,4 +656,28 @@ function media_admin_rebuild_types_batch_complete($success, $results, $operation
     media_variable_del('show_file_type_rebuild_nag');
   }
   drupal_set_message($message);
+}
+
+
+
+/**
+ * Administration form to enable which views to use
+ */
+function media_admin_config_browser_views_form() {
+  $form = array();
+  $form['description'] = array(
+    '#markup' => t('Enable the views you would like to display on your Media browser')
+  );
+  foreach (views_get_all_views() as $view) {
+    $options[$view->name] = $view->human_name ? $view->human_name : $view->description;
+  }
+  $form['media_admin_views_enabled'] = array(
+    '#title' => t('Choose views'),
+    '#type' => 'select',
+    '#multiple' => TRUE,
+    '#size' => 5,
+    '#options' => $options,
+    '#default_value' => variable_get('media_admin_views_enabled')
+  );
+  return system_settings_form($form);
 }

@@ -7,11 +7,11 @@
 function media_browser($selected = NULL) {
   $output = array();
   $output['#attached']['library'][] = array('media', 'media_browser_page');
-  
+
   $params = drupal_get_query_parameters();
   array_walk_recursive($params, '_media_recursive_check_plain');
   media_set_browser_params($params);
-  
+
   // How do we validate these?  I don't know.
   // I think PDO should protect them, but I'm not 100% certain.
   if (isset($params['fid'])) {
@@ -43,7 +43,7 @@ function media_browser($selected = NULL) {
       $plugins[$key]['#weight'] += count($plugins)/1000;
     }
   }
-  
+
   // Only the plugins in this array are loaded.
   if (!empty($params['enabledPlugins'])) {
     $plugins = array_intersect_key($plugins, array_fill_keys($params['enabledPlugins'], 1));
@@ -55,12 +55,12 @@ function media_browser($selected = NULL) {
   foreach ($plugins as $key => &$plugin) {
     $plugin += module_invoke($plugin['#module'], 'media_browser_plugin_view', $key, $params);
   }
-  
+
   // Allow modules to change the tab names or whatever else they want to change
   // before we render.  Perhaps this should be an alter on the theming function
   // that we should write to be making the tabs.
   drupal_alter('media_browser_plugins', $plugins);
-  
+
   $tabs = array(); // List of tabs to render.
 
   $settings = array('media' => array('browser' => array()));
@@ -117,7 +117,7 @@ EOS;
  */
 function media_set_browser_params(&$params = NULL) {
   static $stored_params;
-  
+
   if (!$params) {
     return $stored_params;
   }
@@ -141,18 +141,18 @@ function media_browser_list() {
   // How do we validate these?  I don't know.
   // I think PDO should protect them, but I'm not 100% certain.
   array_walk_recursive($params, '_media_recursive_check_plain');
-  
+
   $types = isset($params['types']) ? $params['types'] : NULL;
   $url_include_patterns = isset($params['url_include_patterns']) ? $params['url_include_patterns'] : NULL;
   $url_exclude_patterns = isset($params['url_exclude_patterns']) ? $params['url_exclude_patterns'] : NULL;
 
   $start = isset($params['start']) ? $params['start'] : 0;
   $limit = isset($params['limit']) ? $params['limit'] : media_variable_get('browser_pager_limit');
-  
+
   $conditions = array();
 
   $query = new EntityFieldQuery();
-  
+
   $query->range($start, $limit);
   $query->entityCondition('entity_type', 'media');
   $query->entityOrderBy('entity_id', 'DESC');
@@ -184,14 +184,13 @@ function media_browser_list() {
   else {
     $media_entities = array();
   }
-  
+
   foreach ($media_entities as &$media) {
     media_browser_build_media_item($media);
   }
-  
+
   drupal_json_output(array('media' => array_values($media_entities)));
   exit();
-
 }
 
 /**
@@ -208,8 +207,21 @@ function media_media_browser_plugin_info() {
   if (user_access('administer media') || user_access('edit media')) {
     $plugins['upload'] = array(
       '#weight' => -10,
-     );
+    );
   }
+
+  // Support views if views exist
+  if (module_exists('views')) {
+    if ($views = variable_get('media_admin_views_enabled')) {
+      // Get all of the views that are type file
+      foreach ($views as $view_name) {
+        $plugins[$view_name] = array(
+          '#weight' => 0,
+        );
+      }
+    }
+  }
+
   return $plugins;
 }
 
@@ -273,6 +285,21 @@ function media_media_browser_plugin_view($plugin_name, $params) {
         '#markup' => '<div id="container"><div id="scrollbox"><ul id="media-browser-library-list" class="media-list-thumbnails"></ul><div id="status"></div></div></div>',
       );
     break;
+  }
+
+  // Support views if views exist
+  if (module_exists('views')) {
+    // Get the enabled views
+    if ($views = variable_get('media_admin_views_enabled')) {
+      // Was this view requested?
+      if (in_array($plugin_name, $views)) {
+        $view = views_get_view($plugin_name);
+        return array(
+          '#title' => $view->human_name ? $view->human_name : $plugin_name,
+          '#markup' => views_embed_view($plugin_name)
+        );
+      }
+    }
   }
 
   return array();
@@ -344,7 +371,7 @@ function media_browser_testbed($form) {
       ),
     )
   );
-  
+
   $launcher = '<a href="#" id="launcher"> Launch Media Browser</a>';
 
   $form['options'] = array(
