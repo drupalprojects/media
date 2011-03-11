@@ -54,8 +54,11 @@ Drupal.media.browser.validateButtons = function() {
   // Drupal.media.popups.mediaBrowser.mediaBrowserOnLoad() auto-triggers the
   // "OK" button action to finalize the selection and remove the IFRAME.
   //
+  // @NOTE some forms may exist inside the browser pane already. We need to
+  // make sure that we still append the fake submit buttons to these as well
+  //
   // @todo An alternate, less hacky solution would be most welcome.
-  if (!($('.form-submit', this).length > 0)) {
+  if (!($('.form-submit', this).length > 0) || ($('.media-browser-require-submit', this).length >0)) {
     $('<a class="button fake-ok">Submit</a>').appendTo(this).bind('click', Drupal.media.browser.submit);
     if (!($('.fake-cancel', this).length > 0)) {
       $('<a class="button fake-cancel">Cancel</a>').appendTo(this).bind('click', Drupal.media.browser.submit);
