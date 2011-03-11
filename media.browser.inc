@@ -294,9 +294,15 @@ function media_media_browser_plugin_view($plugin_name, $params) {
       // Was this view requested?
       if (in_array($plugin_name, $views)) {
         $view = views_get_view($plugin_name);
+        views_add_js('ajax_view');
         return array(
           '#title' => $view->human_name ? $view->human_name : $plugin_name,
-          '#markup' => views_embed_view($plugin_name)
+          '#markup' => views_embed_view($plugin_name),
+          '#attached' => array(
+            'js' => array(
+              drupal_get_path('module', 'views') . '/javascript/plugins/media.library.js',
+            ),
+          ),
         );
       }
     }
