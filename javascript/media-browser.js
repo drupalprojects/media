@@ -55,21 +55,35 @@ Drupal.media.browser.validateButtons = function() {
   // "OK" button action to finalize the selection and remove the IFRAME.
   //
   // @NOTE some forms may exist inside the browser pane already. We need to
-  // make sure that we still append the fake submit buttons to these as well
+  // make sure that we still append the fake submit buttons to these as well.
+  //
+  // @NOTE for forms doing ajax calls inside the panes we have to make sure that
+  // we do not append the fake submit buttons twice or more.
   //
   // @todo An alternate, less hacky solution would be most welcome.
-  if (!($('.form-submit', this).length > 0) || ($('.media-browser-require-submit', this).length >0)) {
-    $('<a class="button fake-ok">Submit</a>').appendTo(this).bind('click', Drupal.media.browser.submit);
-    if (!($('.fake-cancel', this).length > 0)) {
-      $('<a class="button fake-cancel">Cancel</a>').appendTo(this).bind('click', Drupal.media.browser.submit);
+  $(this).each(function () {
+
+
+  // Append a submit on the pane
+  if ($('.media-browser-require-submit', this).length >0) {
+
+    if (! $(this).hasClass('processed')) {
+      $(this).addClass('processed');
+
+      $('<a class="button fake-ok">Submit</a>').appendTo(this).bind('click', Drupal.media.browser.submit);
+      if (!($('.fake-cancel', this).length > 0)) {
+        $('<a class="button fake-cancel">Cancel</a>').appendTo(this).bind('click', Drupal.media.browser.submit);
+      }
+    } else if (!($('.fake-cancel', this).length > 0)) {
+      var parent = $('.form-actions', this);
+      if (!parent.length) {
+        parent = $('form > div', this);
+      }
+      $('<a class="button fake-cancel">Cancel</a>').appendTo(parent).bind('click', Drupal.media.browser.submit);
     }
-  } else if (!($('.fake-cancel', this).length > 0)) {
-    var parent = $('.form-actions', this);
-    if (!parent.length) {
-      parent = $('form > div', this);
-    }
-    $('<a class="button fake-cancel">Cancel</a>').appendTo(parent).bind('click', Drupal.media.browser.submit);
   }
+});
+
 };
 
 Drupal.media.browser.submit = function () {

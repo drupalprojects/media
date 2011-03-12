@@ -340,6 +340,12 @@ function media_theme() {
       'file' => 'media.theme.inc',
     ),
 
+    // Format a view display inside of a browser pane
+    'media_browser_pane_views' => array(
+      'variables' => array('view_html' => NULL),
+      'file' => 'media.theme.inc',
+    ),
+
     // Dialog page.
     'media_dialog_page' => array(
       'render element' => 'page',

@@ -119,6 +119,20 @@ function theme_media_browser_thumbnails($variables) {
 
 
 /**
+ * Theme a view inside of a pane.
+ *
+ * @param string $html
+ * @return string
+ */
+function theme_media_browser_pane_views($variables) {
+  extract($variables);
+  $html =  '<div class="media-browser-require-submit">';
+  $html .= $view_html;
+  $html .= '<div id="status"></div></div>';
+  return $html;
+}
+
+/**
  * Theme a thumbnail.
  * @param $variables
  *   array items being passed in

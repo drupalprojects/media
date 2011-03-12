@@ -282,7 +282,7 @@ function media_media_browser_plugin_view($plugin_name, $params) {
         // We should probably change this to load dynamically when requested
         // via the JS file.
         ),
-        '#markup' => '<div id="container"><div id="scrollbox"><ul id="media-browser-library-list" class="media-list-thumbnails"></ul><div id="status"></div></div></div>',
+        '#markup' => '<div id="container" class="media-browser-require-submit" ><div id="scrollbox"><ul id="media-browser-library-list" class="media-list-thumbnails"></ul><div id="status"></div></div></div>',
       );
     break;
   }
@@ -294,15 +294,11 @@ function media_media_browser_plugin_view($plugin_name, $params) {
       // Was this view requested?
       if (in_array($plugin_name, $views)) {
         $view = views_get_view($plugin_name);
+        $output = views_embed_view($plugin_name);
         views_add_js('ajax_view');
         return array(
           '#title' => $view->human_name ? $view->human_name : $plugin_name,
-          '#markup' => views_embed_view($plugin_name),
-          '#attached' => array(
-            'js' => array(
-              drupal_get_path('module', 'views') . '/javascript/plugins/media.library.js',
-            ),
-          ),
+          '#markup' => theme('media_browser_pane_views', array('view_html' => $output)),
         );
       }
     }
