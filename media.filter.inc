@@ -129,7 +129,7 @@ function media_token_to_markup($match, $wysiwyg = FALSE) {
     if (!is_string($tag)) {
       throw new Exception('Unable to find matching tag');
     }
-    
+
     $media = drupal_json_decode($tag);
 
     if (!isset($media['fid'])) {
@@ -187,7 +187,7 @@ function media_pre_render_text_format($element) {
   if (!isset($element['format'])) {
     return $element;
   }
-  
+
   $field = &$element['value'];
   $settings = array(
     'field' => $field['#id'],
@@ -335,6 +335,11 @@ function media_format_form($form, $form_state, $media) {
   if (!element_children($form['options'])) {
     $form['options']['#attributes'] = array('style' => 'display:none');
   }
+
+  // Add the buttons onto the form
+  $form['buttons'] = array(
+    '#markup' => theme('media_browser_pane_buttons', array('pane_id' => '')),
+  );
 
   return $form;
 }

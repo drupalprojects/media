@@ -302,10 +302,17 @@ function media_media_browser_plugin_view($plugin_name, $params) {
       if (in_array($plugin_name, $views)) {
         $view = views_get_view($plugin_name);
         $output = views_embed_view($plugin_name);
+        // We use view's add js to let views handle dependencies
         views_add_js('ajax_view');
         return array(
           '#title' => $view->human_name ? $view->human_name : $plugin_name,
           '#markup' => $output . theme('media_browser_pane_buttons', array('pane_id' => $plugin_name)),
+          '#settings' => array(
+            'viewMode' => 'thumbnails',
+            'getMediaUrl' => url('media/browser/list'),
+            'types' => $types,
+            'multiselect' => $multiselect,
+          ),
         );
       }
     }

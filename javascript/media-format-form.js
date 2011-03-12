@@ -10,18 +10,6 @@ namespace('Drupal.media.formatForm');
 
 Drupal.media.mediaFormatSelected = {};
 
-Drupal.behaviors.mediaFormatForm = {
-  attach: function (context, settings) {
-    // Add "Submit" and "Cancel" buttons inside the IFRAME that trigger the
-    // behavior of the hidden "OK" and "Cancel" buttons that are outside the
-    // IFRAME. See Drupal.media.browser.validateButtons() for more details.
- 
-    if (Drupal.settings.media_format_form.autosubmit) {
-      $('.button.fake-ok').click();
-    }
-  }
-};
-
 Drupal.media.formatForm.getOptions = function () {
   // Get all the values
   var ret = {}; $.each($('#media-format-form fieldset#edit-options *').serializeArray(), function (i, field) { ret[field.name] = field.value; });
@@ -42,5 +30,17 @@ Drupal.media.formatForm.submit = function () {
     buttons[0].click();
   }
 }
+
+
+/**
+ * Bind clicks to the submit/cancel buttons
+ */
+Drupal.behaviors.formatForm = {
+  attach: function (context, settings) {
+    $('a.button.fake-ok').not('.processed').bind('click', Drupal.media.formatForm.submit).addClass('processed');
+    $('a.button.fake-cancel').not('.processed').bind('click', Drupal.media.formatForm.submit).addClass('processed');
+  }
+};
+
 
 })(jQuery);

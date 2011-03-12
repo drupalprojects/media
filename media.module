@@ -776,7 +776,9 @@ function media_library() {
   $libraries['media_base'] = array(
     'title' => 'Media base',
     'js' => array(
-      $path . '/javascript/media.core.js' => array('group' => JS_LIBRARY, 'weight' => - 5),
+      $path . '/javascript/media-core.js' => array('group' => JS_LIBRARY, 'weight' => - 5),
+      $path . '/javascript/media.js' => array('group' => JS_LIBRARY),
+      $path . '/javascript/media-popups.js' => array('group' => JS_LIBRARY),
       $path . '/javascript/util/json2.js' => array('group' => JS_LIBRARY),
       $path . '/javascript/util/ba-debug.min.js' => array('group' => JS_LIBRARY),
     ),
