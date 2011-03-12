@@ -263,6 +263,11 @@ function media_media_browser_plugin_view($plugin_name, $params) {
       );
       break;
     case 'library':
+      // Build the structured HTML to output
+      $output = '<div id="container" class="media-browser-require-submit" ><div id="scrollbox"><ul id="media-browser-library-list" class="media-list-thumbnails"></ul><div id="status"></div></div></div>';
+      // We need to add the fake submit/cancel
+      $output .= theme('media_browser_pane_markup', array('view_html' => '', 'pane_id' => $plugin_name));
+
       return array(
         '#title' => t('Library'),
         '#attached' => array(
@@ -284,7 +289,7 @@ function media_media_browser_plugin_view($plugin_name, $params) {
         ),
         // this should probably use theme('media_browser_pane_markup') if we
         // keep this in
-        '#markup' => '<div id="container" class="media-browser-require-submit" ><div id="scrollbox"><ul id="media-browser-library-list" class="media-list-thumbnails"></ul><div id="status"></div></div></div>',
+        '#markup' => $output
       );
     break;
   }
