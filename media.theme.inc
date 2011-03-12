@@ -7,18 +7,17 @@
  * Theming functions for the Media module.
  */
 
+
 /**
- * Display the media file browser.
- * @TODO this is depreciated I think
+ * Display a media file list.
+
  * @param array $element
  *   The form element.
  * @return string
  */
-function theme_media_file_browser($element) {
+function theme_media_file_list($element) {
   // Add the CSS for our display.
-  $output = '<div class="media browser">' . $element . '</div>';
-
-  return $output;
+  return '<div class="media-file-list">' . theme('form_element', $element, $element['#children']) . '</div>';
 }
 
 
@@ -145,43 +144,6 @@ function template_preprocess_media_dialog_page(&$variables) {
 
 
 /**
- * Theme function to display the results limiting- 10, 30, 50 results
- * per page.
- *
- * @param $variables
- *   array parameters
- * @return unknown
- */
-function theme_media_browser_control_result_limit($variables) {
-  // Pull out all the variables into a usable form
-  extract($variables);
-
-  if (! isset($limits)) {
-    $limits = array(10, 30, 50);
-  }
-  // @NOTE these do not need to be aware of the current
-  //       page because clicking them will reset the
-  //       display to 1 -> $limit
-  $parameters['page'] = 0;
-  // save the active limit
-  $current_limit = $parameters['limit'];
-  foreach ($limits as $limit) {
-    if ($limit == $current_limit) {
-      $class = 'active';
-    }
-    else {
-      $class = '';
-    }
-    // set the value of this limit parameter to this limit value
-    $parameters['limit'] = $limit;
-    $per_display[] = l($limit, $limit, array('query' => $parameters, 'attributes' => array('class' => $class)));
-  }
-
-  return theme('item_list', array('items'  => $per_display, 'attributes' => array('class' => 'result_limit')));
-}
-
-
-/**
  * Stolen from file.module theme_file_link
  *
  * @param $variables
@@ -213,6 +175,7 @@ function theme_media_link($variables) {
 
   return '<span class="file">' . $icon . ' ' . l($link_text, $url, $options) . '</span>';
 }
+
 
 /**
  * Adds a wrapper around a preview of a media file.
