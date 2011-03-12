@@ -266,7 +266,7 @@ function media_media_browser_plugin_view($plugin_name, $params) {
       // Build the structured HTML to output
       $output = '<div id="container" class="media-browser-require-submit" ><div id="scrollbox"><ul id="media-browser-library-list" class="media-list-thumbnails"></ul><div id="status"></div></div></div>';
       // We need to add the fake submit/cancel
-      $output .= theme('media_browser_pane_markup', array('view_html' => '', 'pane_id' => $plugin_name));
+      $output .= theme('media_browser_pane_buttons', array('pane_id' => $plugin_name));
 
       return array(
         '#title' => t('Library'),
@@ -305,7 +305,7 @@ function media_media_browser_plugin_view($plugin_name, $params) {
         views_add_js('ajax_view');
         return array(
           '#title' => $view->human_name ? $view->human_name : $plugin_name,
-          '#markup' => theme('media_browser_pane_markup', array('view_html' => $output, 'pane_id' => $plugin_name)),
+          '#markup' => $output . theme('media_browser_pane_buttons', array('pane_id' => $plugin_name)),
         );
       }
     }

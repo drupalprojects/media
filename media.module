@@ -335,9 +335,9 @@ function media_theme() {
       'file' => 'media.theme.inc',
     ),
 
-    // Format a view display inside of a browser pane
-    'media_browser_pane_markup' => array(
-      'variables' => array('view_html' => NULL, 'fake_form' => TRUE, 'pane_id' => NULL),
+    // Render the submit/cancel buttons
+    'media_browser_pane_buttons' => array(
+      'variables' => array('pane_id' => NULL),
       'file' => 'media.theme.inc',
     ),
 
