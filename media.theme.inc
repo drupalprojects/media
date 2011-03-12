@@ -33,33 +33,6 @@ function theme_media_file_list($element) {
   return '<div class="media-file-list">' . theme('form_element', $element, $element['#children']) . '</div>';
 }
 
-/**
- * Display a browser pane.
- * @TODO this is depreciated I think
- *
- * @param array $form
- *   The form element.
- * @return string
- */
-function theme_media_browser_pane($form) {
-  return;
-  $output   = array();
-
-  // render the drawers
-  $output[] = '<div' . drupal_attributes($form['#attributes']) . '>';
-
-  // render the drawer list
-  $output[] = '  <div class="browser drawers">';
-  $output[] = drupal_render_form(null, $form['drawers']);
-  $output[] = ' </div>';
-
-  // render the drawer displays
-  $output[] = drupal_render_form(null, $form);
-  $output[] = '</div>';
-
-  return implode("\n", $output);
-}
-
 
 /**
  * Display a item list of files as thumbnails. Implements
