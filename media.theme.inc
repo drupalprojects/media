@@ -62,44 +62,6 @@ function theme_media_browser_pane($form) {
 
 
 /**
- * Default theming function for creating the browser frame.
- * Assumes an array of file objects as $files and an
- * array of $parameters
- * @param $variables
- *   array of variables
- * @return unknown_type
- */
-function theme_media_browser_content_frame($variables) {
-  // Pull out all the variables into a usable form
-  extract($variables);
-  // Did we get any files back?
-  if (! count($files)) {
-    // @TODO display no files found
-  }
-
-  $html = array();
-
-  // On the first invocation, load javascript and build the browser frame
-   if ($invoke) {
-
-
-  }
-   // Render the results limiter
-  $html[] = theme('media_browser_control_result_limit', array('parameters' => $parameters));
-  // Render the actual content
-  $form = drupal_get_form('media_file_listing_form', $files, $parameters);
-  $html[] = drupal_render($form);
-
-  // Make sure to close the wrapping div
-  if ($invoke) {
-    $html[] = '</div>';
-  }
-  return implode("\n", $html);
-}
-
-
-
-/**
  * Display a item list of files as thumbnails. Implements
  * the admin thumbnail theme for now- serves as a wrapper
  *
@@ -133,9 +95,7 @@ function theme_media_browser_thumbnails($variables) {
  */
 function theme_media_browser_pane_markup($variables) {
   extract($variables);
-  $html =  '<div class="media-browser-require-submit">';
-  $html .= $view_html;
-  $html .= '<div id="status"></div></div>';
+  $html = $view_html;
   if ($fake_form) {
     $html .= '<a class="button fake-ok ui-dialog-buttonpane ' . $pane_id . '">' . t('Submit') . '</a>';
     $html .= '<a class="button fake-cancel ui-dialog-buttonpane ' . $pane_id . '">' . t('Cancel') . '</a>';
