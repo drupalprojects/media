@@ -306,11 +306,6 @@ function media_permission() {
 function media_theme() {
   return array(
 
-    // The default media file list form element.
-    'media_file_list' => array(
-      'variables' => array('element' => NULL),
-    ),
-
     // A link for a file w/ an icon to the media/$fid page.
     'media_link' => array(
       'variables' => array('file' => NULL),
@@ -716,7 +711,6 @@ function media_file_list_element_process($element, $edit, $form_state, $form) {
     '#options'  => $element['#options'],
     '#size'     => media_variable_get('file_list_size'),
   );
-
   return $element;
 }
 
