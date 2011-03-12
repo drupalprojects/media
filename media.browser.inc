@@ -282,6 +282,8 @@ function media_media_browser_plugin_view($plugin_name, $params) {
         // We should probably change this to load dynamically when requested
         // via the JS file.
         ),
+        // this should probably use theme('media_browser_pane_markup') if we
+        // keep this in
         '#markup' => '<div id="container" class="media-browser-require-submit" ><div id="scrollbox"><ul id="media-browser-library-list" class="media-list-thumbnails"></ul><div id="status"></div></div></div>',
       );
     break;
@@ -298,7 +300,7 @@ function media_media_browser_plugin_view($plugin_name, $params) {
         views_add_js('ajax_view');
         return array(
           '#title' => $view->human_name ? $view->human_name : $plugin_name,
-          '#markup' => theme('media_browser_pane_views', array('view_html' => $output)),
+          '#markup' => theme('media_browser_pane_markup', array('view_html' => $output, 'pane_id' => $plugin_name)),
         );
       }
     }

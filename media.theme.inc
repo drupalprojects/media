@@ -121,16 +121,28 @@ function theme_media_browser_thumbnails($variables) {
 /**
  * Theme a view inside of a pane.
  *
- * @param string $html
+ * See Drupal.media.browser.validateButtons for the JS which handles the submission
+ * of the fake form
+ *
+ * @param array $varriables
+ *   $html string: HTML to render inside the pane
+ *   $pane_id string: id of the current pane
+ *   $fake_form boolean: should this create fake submit buttons to handle the FID
+ *     selection
  * @return string
  */
-function theme_media_browser_pane_views($variables) {
+function theme_media_browser_pane_markup($variables) {
   extract($variables);
   $html =  '<div class="media-browser-require-submit">';
   $html .= $view_html;
   $html .= '<div id="status"></div></div>';
+  if ($fake_form) {
+    $html .= '<a class="button fake-ok ui-dialog-buttonpane ' . $pane_id . '">' . t('Submit') . '</a>';
+    $html .= '<a class="button fake-cancel ui-dialog-buttonpane ' . $pane_id . '">' . t('Cancel') . '</a>';
+  }
   return $html;
 }
+
 
 /**
  * Theme a thumbnail.
