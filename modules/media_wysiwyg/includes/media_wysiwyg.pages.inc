@@ -175,9 +175,19 @@ function media_wysiwyg_format_form_view_mode(&$form, $form_state, $file) {
     $view_mode = variable_get('media_wysiwyg_wysiwyg_default_view_mode', 'full');
   }
 
+  $link_options = array(
+    'attributes' => array(
+      'class' => 'button',
+      'title' => t('Use for replace fox or edit file fields.'),
+    ),
+  );
+  if (!empty($_GET['render'])) {
+    $link_options['query']['render'] = $_GET['render'];
+  }
+
   $form['preview'] = array();
   $form['preview']['#prefix'] = '<div class="media-preview-group"><div class="media-item"><div class="media-thumbnail">';
-  $form['preview']['#suffix'] = '</div><div class="label-wrapper"><label class="media-filename">' . check_plain($file->filename) . '</label></div></div><div class="edit-file-link">' . l(t('Edit file'), 'file/' . $file->fid . '/edit', array('attributes' => array('class' => 'button', 'title' => t('Use for replace file or edit file fields.')))) . '</div></div>';
+  $form['preview']['#suffix'] = '</div><div class="label-wrapper"><label class="media-filename">' . check_plain($file->filename) . '</label></div></div><div class="edit-file-link">' . l(t('Edit file'), 'file/' . $file->fid . '/edit', $link_options) . '</div></div>';
   $form['preview']['thumbnail'] = file_view_file($file, $view_mode);
   $form['preview']['thumbnail']['#prefix'] = '<div id="media-preview">';
   $form['preview']['thumbnail']['#suffix'] = '</div>';
