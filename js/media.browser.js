@@ -43,7 +43,7 @@ Drupal.behaviors.MediaBrowser = {
 
     // Keep keyboard focus from going to the browser chrome.
     $('body', context).once(function () {
-      $(window).on('keydown', function (event) {
+      $(window).bind('keydown', function (event) {
         if (event.keyCode === 9) {
           var tabbables = $(':tabbable'),
               first = tabbables.filter(':first'),
