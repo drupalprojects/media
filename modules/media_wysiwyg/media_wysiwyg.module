@@ -5,6 +5,10 @@
  * Primarily Drupal hooks.
  */
 
+// The current version of media token format. The version number has to be
+// compatible with PHP's version_compare();
+define('MEDIA_WYSIWYG_TOKEN_VERSION', '3.0');
+
 // Functions for tracking the file usage of [[inline tags]].
 require_once dirname(__FILE__) . '/includes/media_wysiwyg.file_usage.inc';
 
@@ -61,6 +65,13 @@ function media_wysiwyg_menu() {
     'file' => 'includes/media_wysiwyg.pages.inc',
     'theme callback' => 'media_dialog_get_theme_name',
     'type' => MENU_CALLBACK,
+  );
+  $items['admin/reports/status/upgrade-media-tokens'] = array(
+    'title' => 'Rebuild media tokens',
+    'description' => "Scans content for media tokens and upgrades them to the latest format version.",
+    'access arguments' => array('administer site configuration'),
+    'page callback' => 'media_wysiwyg_upgrade_content_tokens',
+    'file' => 'includes/media_wysiwyg.pages.inc',
   );
 
   return $items;
