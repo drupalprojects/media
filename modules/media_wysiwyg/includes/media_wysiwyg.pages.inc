@@ -243,7 +243,11 @@ function media_wysiwyg_format_form_preview($form, $form_state) {
  *   The media token as a json-decoded array.
  */
 function media_wysiwyg_upgrade_token(array &$tag_info) {
-  // Actual Upgrade code.
+  $version = variable_get('media_wysiwyg_token_version', '');
+  if (version_compare($version, '3.0', '<')) {
+    media_wysiwyg_aggregate_alignment($tag_info);
+  }
+  // Successive upgrades follows here.
 }
 
 /**
