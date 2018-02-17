@@ -88,7 +88,7 @@ function media_wysiwyg_uninstall() {
  */
 function media_wysiwyg_requirements($phase) {
   if ($phase != 'runtime') {
-    return;
+    return array();
   }
   $t = get_t();
   $version = variable_get('media_wysiwyg_token_version', '');
