@@ -322,7 +322,7 @@ function media_wysiwyg_token_to_markup($match, $wysiwyg = FALSE, $langcode = NUL
     $element = array();
     // Render the file entity, for sites using the file_entity rendering method.
     if (variable_get('media_wysiwyg_default_render', 'file_entity') == 'file_entity') {
-      $element['content'] = file_view($file, $tag_info['view_mode']);
+      $element['content'] = file_view($file, $tag_info['view_mode'], $langcode);
     }
     $element['content']['file'] = media_wysiwyg_get_file_without_label($file, $tag_info['view_mode'], $settings, $langcode);
     // Overwrite or set the file #alt attribute if it has been set in this
