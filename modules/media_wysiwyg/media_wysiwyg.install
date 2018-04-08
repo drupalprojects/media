@@ -100,7 +100,7 @@ function media_wysiwyg_requirements($phase) {
     $req['severity'] = REQUIREMENT_OK;
   }
   else {
-    $req['value'] = $version ? $version . '(' . $t("Outdated") . ')' : $t("Unknown");
+    $req['value'] = $version ? $version . ' (' . $t("Out of date") . ')' : $t("Unknown");
     $req['severity'] = REQUIREMENT_WARNING;
     $req['description'] = $t("Existing media tokens in content may need to be updated to keep up with the latest features in the media module. This operation will alter the content in the database in-place without creating new revisions, so it's recommended to backup your database before you do this.");
     $req['description'] .= ' ';

@@ -116,16 +116,14 @@ class MediaWYSIWYGWYSIWYGOverridesTest extends MediaWYSIWYGMacroTestHelper {
     $this->assertRaw('width="100"', t('Image displays with default width attribute.'));
     $this->assertRaw('height="100"', t('Image displays with default height attribute.'));
 
-    // Create a node with a style attribute. Assert that the float is translated
-    // to a media-wysiwyg-align-* class and the rest remains present on the <img>
-    // tag.
+    // Create a media token with a style attribute and assert that it is
+    // rendered.
     $attributes = array(
-      'style' => 'float: right; width: 50px;',
+      'style' => 'width: 50px;',
     );
     $nid = $this->createNode($file->fid, $attributes);
     $this->drupalGet('node/' . $nid);
-    $this->assertPattern('|<div class="media [^">]*media-wysiwyg-align-right|', t("Image aligned with inline css (float) converted to alignment class."));
-    $this->assertPattern('|<img[^>]* style="[^">]*width:50px|', t("Image displays with overriden attributes."));
+    $this->assertPattern('|<img[^>]* style="[^">]*width: *50px|', t("Image displays with overridden attributes."));
 
     // Create a node with overriden alt/title attributes.
     $attributes = array(

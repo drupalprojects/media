@@ -202,6 +202,30 @@ function media_wysiwyg_overridable_fields() {
 }
 
 /**
+ * Validate media instance settings according to token schema.
+ *
+ * @param $settings
+ *   The media instance settings, aka tag_info.
+ */
+function media_wysiwyg_validate_instance_settings(&$settings) {
+  $schema = media_wysiwyg_schema_token();
+  foreach ($schema as $property => $prop_settings) {
+    if ($prop_settings['required'] && (!isset($settings[$property]) || !$settings[$property])) {
+      throw new Exception("Token schema error: Required property missing: '" . $property . "'");
+    }
+    if (!isset($settings[$property]) || empty($settings[$property])) {
+      // We set default values for properties that are empty to force the
+      // correct type on it, and set non-required properties that have
+      // non-empty values as default.
+      $settings[$property] = $prop_settings['default'];
+    }
+  }
+  if ($settings['type'] !== 'media') {
+    throw new Exception("Token schema error: Token not of type 'media'");
+  }
+}
+
+/**
  * Convert a media token into HTML markup.
  *
  * @param string $token
@@ -226,18 +250,7 @@ function media_wysiwyg_token_to_markup($token, $wysiwyg = FALSE, $langcode = NUL
     }
 
     $tag_info = drupal_json_decode($json);
-    foreach (media_wysiwyg_schema_token() as $property => $prop_settings) {
-      if ($prop_settings['required'] && (!isset($tag_info[$property]) || !$tag_info[$property])) {
-        throw new Exception("Token schema error: Required property missing: '" . $property . "'");
-      }
-      if (!isset($tag_info[$property]) || empty($tag_info[$property])) {
-        // We set default values for properties that are empty to force the
-        // correct type on it, and set non-required properties that have
-        // non-empty values as default.
-        $tag_info[$property] = $prop_settings['default'];
-      }
-    }
-
+    media_wysiwyg_validate_instance_settings($tag_info);
     if ($tag_info['view_mode'] != 'default') {
       $file_entity_info = entity_get_info('file');
       if (!in_array($tag_info['view_mode'], array_keys($file_entity_info['view modes']))) {
@@ -278,9 +291,6 @@ function media_wysiwyg_token_to_markup($token, $wysiwyg = FALSE, $langcode = NUL
     }
 
     $settings = $fields;
-    // Aggregate alignment info early in the process, prior to allowed
-    // attributes filtering.
-    $alignment = media_wysiwyg_aggregate_alignment($tag_info);
 
     // Analyze and filter attributes from token.
     $settings['attributes'] = array();
@@ -394,8 +404,8 @@ function media_wysiwyg_token_to_markup($token, $wysiwyg = FALSE, $langcode = NUL
       }
     }
 
-    if ($alignment && !empty($element['content'])) {
-      $element['content']['#attributes']['class'][] = 'media-wysiwyg-align-' . $alignment;
+    if (!empty($tag_info['alignment']) && !empty($element['content'])) {
+      $element['content']['#attributes']['class'][] = 'media-wysiwyg-align-' . $tag_info['alignment'];
     }
     // Conditionally add a pre-render if the media filter output is be cached.
     $filters = filter_get_filters();
@@ -498,81 +508,6 @@ function media_wysiwyg_filter_field_parser(array $tag_info) {
     }
   }
   return $fields;
-}
-
-/**
- * Find and aggregate alignment in media tag.
- *
- * Aggregate and uniform various methods for aligning media to one setting. In
- * the process it removes all 'old' methods, like inline style floats and the
- * align attribute. The final alignment is stored in $tag_info['alignment'] and
- * is returned.
- *
- * @param array $tag_info
- *   JSON-decoded media macro.
- *
- * @return string
- *   The alignment of the media, either 'left', 'center', 'right' or '' if
- *   unset.
- */
-function media_wysiwyg_aggregate_alignment(array &$tag_info) {
-  $alignment = '';
-  if (!isset($tag_info['attributes']) || !is_array($tag_info['attributes'])) {
-    return $alignment;
-  }
-  $attributes = &$tag_info['attributes'];
-  // Media alignment handling: Transform alignment using either the 'align' or
-  // 'style' attributes to configuration. Inline style has higher priority over
-  // the align attribute, so we check the 'align' attribute first.
-  if (isset($attributes['align'])) {
-    $alignment = $attributes['align'];
-    unset($attributes['align']);
-  }
-
-  // Extract from inline style (float).
-  if (!empty($attributes['style'])) {
-    $css_properties = media_wysiwyg_parse_css_declarations($attributes['style']);
-    if (isset($css_properties['float'])) {
-      $alignment = $css_properties['float'];
-      unset($css_properties['float']);
-      $attributes['style'] = media_wysiwyg_stringify_css_declarations($css_properties);
-
-      if (!$attributes['style']) {
-        unset($attributes['style']);
-      }
-    }
-  }
-
-  // Check for alignment in media alignment classes.
-  $alignment_options = array('left', 'center', 'right');
-  if (!empty($attributes['class'])) {
-    $class_was_exploded = FALSE;
-    if (!is_array($attributes['class'])) {
-      $attributes['class'] = explode(' ', $attributes['class']);
-      $class_was_exploded = TRUE;
-    }
-    $alignment_classes = array_map(function ($item) {
-      return 'media-wysiwyg-align-' . $item;
-    }, $alignment_options);
-
-    $alignments = array_intersect($attributes['class'], $alignment_classes);
-    if ($alignments) {
-      sscanf(end($alignments), 'media-wysiwyg-align-%s', $alignment);
-      $attributes['class'] = array_diff($attributes['class'], $alignment_classes);
-    }
-    if ($class_was_exploded) {
-      $attributes['class'] = implode(' ', $attributes['class']);
-    }
-  }
-
-  // The actual setting, if it exists, should triumph all of the above.
-  if (!empty($tag_info['alignment'])) {
-    $alignment = $tag_info['alignment'];
-  }
-
-  // The one place to rule them all:
-  $tag_info['alignment'] = in_array($alignment, $alignment_options) ? $alignment : '';
-  return $tag_info['alignment'];
 }
 
 /**

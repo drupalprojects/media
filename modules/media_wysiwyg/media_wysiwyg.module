@@ -7,7 +7,7 @@
 
 // The current version of media token format. The version number has to be
 // compatible with PHP's version_compare();
-define('MEDIA_WYSIWYG_TOKEN_VERSION', '3.0');
+define('MEDIA_WYSIWYG_TOKEN_VERSION', '4.0');
 
 // Functions for tracking the file usage of [[inline tags]].
 require_once dirname(__FILE__) . '/includes/media_wysiwyg.file_usage.inc';
@@ -67,7 +67,8 @@ function media_wysiwyg_menu() {
     'title' => 'Rebuild media tokens',
     'description' => "Scans content for media tokens and upgrades them to the latest format version.",
     'access arguments' => array('administer site configuration'),
-    'page callback' => 'media_wysiwyg_upgrade_content_tokens',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('media_wysiwyg_upgrade_content_tokens'),
     'file' => 'includes/media_wysiwyg.pages.inc',
   );
 
@@ -166,20 +167,13 @@ function media_wysiwyg_pre_render_text_format($element) {
 }
 
 /**
- * Build the global client side settings for wysiwyg editing.
+ * Map between html attribute and the file field that feeds it.
  */
-function media_wysiwyg_global_js_settings() {
-  $settings = array(
-    'tokenSchema' => media_wysiwyg_schema_token('js'),
-    'wysiwygAllowedAttributes' => media_wysiwyg_allowed_attributes(),
-    'doLinkText' => (boolean) variable_get('media_wysiwyg_use_link_text_for_filename', 1),
-    'overridableFields' => media_wysiwyg_overridable_fields(),
-    'attributeFields' => array(
-      'alt' => 'field_file_image_alt_text',
-      'title' => 'field_file_image_title_text',
-    ),
+function media_wysiwyg_get_attribute_fields() {
+  $map = array(
+    'alt' => 'field_file_image_alt_text',
+    'title' => 'field_file_image_title_text',
   );
-
   // The file_entity module lets you specify a string, possibly with tokens, for
   // the alt and title attributes of images. We need the actual field names
   // instead. If the variable only contains a token of the format
@@ -188,11 +182,25 @@ function media_wysiwyg_global_js_settings() {
   $title_token = variable_get('file_entity_title', '[file:field_file_image_title_text]');
   $matches = array();
   if (preg_match('/^\[file:(field_[[:alnum:]_-]+)\]$/', trim($alt_token), $matches)) {
-    $settings['attributeFields']['alt'] = $matches[1];
+    $map['alt'] = $matches[1];
   }
   if (preg_match('/^\[file:(field_[[:alnum:]_-]+)\]$/', trim($title_token), $matches)) {
-    $settings['attributeFields']['title'] = $matches[1];
+    $map['title'] = $matches[1];
   }
+  return $map;
+}
+
+/**
+ * Build the global client side settings for wysiwyg editing.
+ */
+function media_wysiwyg_global_js_settings() {
+  $settings = array(
+    'tokenSchema' => media_wysiwyg_schema_token('js'),
+    'wysiwygAllowedAttributes' => media_wysiwyg_allowed_attributes(),
+    'doLinkText' => (boolean) variable_get('media_wysiwyg_use_link_text_for_filename', 1),
+    'overridableFields' => media_wysiwyg_overridable_fields(),
+    'attributeFields' => media_wysiwyg_get_attribute_fields(),
+  );
   return $settings;
 }
 
