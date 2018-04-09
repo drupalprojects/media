@@ -13,7 +13,6 @@
 function media_wysiwyg_upgrade_content_tokens_batch(&$context) {
   $items_per_run = 20;
 
-  module_load_include('inc', 'media_wysiwyg', 'includes/media_wysiwyg.upgrade');
   $query = db_select('file_managed', 'fm');
   $query->innerJoin('file_usage', 'fu', 'fm.fid = fu.fid');
   $query->fields('fu', array('type', 'id'))
