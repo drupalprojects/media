@@ -122,6 +122,7 @@ Drupal.media.WysiwygInstance.prototype = {
       throw "Invalid state: Cannot verify settings without settings.";
     }
     $.each(Drupal.settings.media.tokenSchema, function(property, propSettings) {
+      var settingValue;
       if (propSettings.required) {
         if (!self.settings[property]) {
           throw "Media token parse error: Missing required property '" + property + "'.";
@@ -131,6 +132,15 @@ Drupal.media.WysiwygInstance.prototype = {
         if (!self.settings[property]) {
           // For empty values, use the default value from schema to assert its type.
           self.settings[property] = Drupal.media.utils.copyAsNew(propSettings.default);
+        }
+      }
+      if (propSettings.options !== undefined && self.settings[property]) {
+        settingValue = self.settings[property];
+        if (!propSettings.options[settingValue]) {
+          // Add default value instead of throwing exception. At least the
+          // editor will have something to work with.
+          // @todo: Error logging/message about malformed token?
+          self.settings[property] = propSettings.default;
         }
       }
     });
@@ -567,14 +577,16 @@ Drupal.media.WysiwygInstance.prototype = {
         pristine[property] = Drupal.media.utils.copyAsNew(settings[property]);
       }
     });
-    // Copy all fields that belong to this file type.
-    $.each(Drupal.media.WysiwygInstance.getOverridableFields(settings.fid), function(field) {
-      $.each(settings, function(property) {
-        if (property.startsWith(field + '[')) {
-          pristine[property] = settings[property];
-        }
+    if (settings.instance_fields === "override") {
+      // Copy all overridable fields that belong to this file type.
+      $.each(Drupal.media.WysiwygInstance.getOverridableFields(settings.fid), function(field) {
+        $.each(settings, function(property) {
+          if (property.startsWith(field + '[')) {
+            pristine[property] = settings[property];
+          }
+        });
       });
-    });
+    }
     if (pristine.attributes) {
       // Remove attributes already present as fields.
       $.each(Drupal.settings.media.attributeFields, function(attribute) {

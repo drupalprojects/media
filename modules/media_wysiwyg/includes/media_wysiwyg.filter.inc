@@ -144,6 +144,14 @@ function media_wysiwyg_stringify_css_declarations(array $properties) {
  * @param $lang
  *   The programming language this is targeted at. Either 'php' (default) or
  *   'js'.
+ *
+ * @return array
+ *   Structured array with properties (array keys) the media token may consist
+ *   of. Each property is an array with the following keys:
+ *   - required: (All) Whether or not this property is required in the token.
+ *   - default: (All) Default value for property.
+ *   - options: (Optional): List of allowed values for property where the key is
+ *     the allowed value.
  */
 function media_wysiwyg_schema_token($lang = 'php') {
   $schema = array(
@@ -159,12 +167,30 @@ function media_wysiwyg_schema_token($lang = 'php') {
       'required' => FALSE,
       'default' => variable_get('media_wysiwyg_wysiwyg_default_view_mode', 'full'),
     ),
+    'alignment' => array(
+      'required' => FALSE,
+      'default' => NULL,
+      'options' => array(
+        '' => t("None"),
+        'left' => t("Left"),
+        'center' => t("Center"),
+        'right' => t("Right"),
+      ),
+    ),
+    'instance_fields' => array(
+      'required' => FALSE,
+      'default' => 'override',
+      'options' => array(
+        'global' => t("Global"),
+        'override' => t("Override"),
+      ),
+    ),
     'attributes' => array(
       'required' => FALSE,
       'default' => $lang == 'js' ? new StdClass() : array(),
     ),
   );
-  foreach (array('alignment', 'external_url', 'link_text') as $property) {
+  foreach (array('external_url', 'link_text') as $property) {
     $schema[$property] = array(
       'required' => FALSE,
       'default' => NULL,
@@ -218,6 +244,14 @@ function media_wysiwyg_validate_instance_settings(&$settings) {
       // correct type on it, and set non-required properties that have
       // non-empty values as default.
       $settings[$property] = $prop_settings['default'];
+    }
+    else {
+      if (isset($prop_settings['options']) && !isset($prop_settings['options'][$settings[$property]])) {
+        // Invalid option. Instead of throwing an exception, set the default
+        // value so the media instance at least is rendered. @todo: Add some
+        // message/log about malformed token?
+        $settings[$property] = $prop_settings['default'];
+      }
     }
   }
   if ($settings['type'] !== 'media') {
@@ -284,13 +318,17 @@ function media_wysiwyg_token_to_markup($token, $wysiwyg = FALSE, $langcode = NUL
 
     $tag_info['file'] = $file;
 
-    // Grab the potentially overridden fields from the file.
-    $fields = media_wysiwyg_filter_field_parser($tag_info);
-    foreach ($fields as $key => $value) {
-      $file->{$key} = $value;
+    if ($tag_info['instance_fields'] == 'override') {
+      // Grab the potentially overridden fields from the file.
+      $settings = media_wysiwyg_filter_field_parser($tag_info);
+      foreach ($settings as $key => $value) {
+        $file->{$key} = $value;
+      }
+    }
+    else {
+      $settings = array();
     }
 
-    $settings = $fields;
     if (isset($tag_info['external_url'])) {
       $settings['external_url'] = $tag_info['external_url'];
     }

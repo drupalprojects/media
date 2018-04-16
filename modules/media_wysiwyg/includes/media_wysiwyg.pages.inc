@@ -17,9 +17,10 @@ function media_wysiwyg_format_form($form, &$form_state, $file) {
 
   // Build instance settings from token schema defaults and anything from query
   // parameters (ajax).
+  $token_schema = media_wysiwyg_schema_token();
   $instance_settings = array_map(function ($property) {
     return $property['default'];
-  }, media_wysiwyg_schema_token());
+  }, $token_schema);
 
   if (isset($_GET['instance_settings'])) {
     $instance_settings = array_merge($instance_settings, drupal_json_decode($_GET['instance_settings']));
@@ -100,17 +101,18 @@ function media_wysiwyg_format_form($form, &$form_state, $file) {
     $form['options']['alignment'] = array(
       '#type' => 'select',
       '#title' => t('Alignment'),
-      '#options' => array(
-        '' => t('None'),
-        'left' => t('Left'),
-        'right' => t('Right'),
-        'center' => t('Center'),
-      ),
+      '#options' => $token_schema['alignment']['options'],
       '#description' => t('Choose how you would like the media to be aligned with surrounding content.'),
       '#default_value' => $instance_settings['alignment'],
     );
   }
-
+  $form['options']['instance_fields'] = array(
+    '#type' => 'radios',
+    '#title' => t("Instance field values"),
+    '#options' => $token_schema['instance_fields']['options'],
+    '#description' => t("<em>Global</em> will use the values from the file itself. <em>Override</em> will set custom values for this instance only, based on the file's global field values.<br /><strong>Be aware:</strong> Using <em>Global</em> will cause later edits on the file will affect this instance as well."),
+    '#default_value' => $instance_settings['instance_fields'],
+  );
   // Add fields from the file, so that we can override them if necessary.
   $fields = media_wysiwyg_filter_field_parser($instance_settings, $file);
   foreach ($fields as $field_name => $field_value) {
@@ -127,6 +129,13 @@ function media_wysiwyg_format_form($form, &$form_state, $file) {
       $allow = variable_get('media_wysiwyg_wysiwyg_override_multivalue', FALSE);
     }
     $form['options']['fields'][$field_name]['#access'] = $allow;
+    if ($allow) {
+      $form['options']['fields'][$field_name]['#states'] = array(
+        'visible' => array(
+          ':input[name="instance_fields"]' => array('value' => "override"),
+        ),
+      );
+    }
   }
 
   // Field to attach external url's to files for linking.
