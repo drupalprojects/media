@@ -635,9 +635,9 @@ function media_wysiwyg_get_file_view_mode_options($file) {
  */
 function media_wysiwyg_file_displays_alter(&$displays, $file, $view_mode) {
   // Override the fields of the file when requested by the WYSIWYG.
-  if (isset($file->override) && isset($file->override['fields'])) {
+  if (isset($file->override)) {
     $instance = field_info_instances('file', $file->type);
-    foreach ($file->override['fields'] as $field_name => $value) {
+    foreach ($file->override as $field_name => $value) {
       if (!isset($instance[$field_name]['settings']) || !isset($instance[$field_name]['settings']['wysiwyg_override']) || $instance[$field_name]['settings']['wysiwyg_override']) {
         $file->{$field_name} = $value;
       }

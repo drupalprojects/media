@@ -291,7 +291,9 @@ function media_wysiwyg_token_to_markup($token, $wysiwyg = FALSE, $langcode = NUL
     }
 
     $settings = $fields;
-
+    if (isset($tag_info['external_url'])) {
+      $settings['external_url'] = $tag_info['external_url'];
+    }
     // Analyze and filter attributes from token.
     $settings['attributes'] = array();
     if (!empty($tag_info['attributes']) && is_array($tag_info['attributes'])) {
