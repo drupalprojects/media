@@ -55,15 +55,6 @@ Drupal.media.WysiwygInstance = function(instanceInfo, placeholderBase) {
   this.key = '';
 
   /**
-   * @var {string} The 'stub' HTML representing the media instance.
-   *
-   * This is the basic, html version of the file for the given instance,
-   * independent of the other settings provided by the macro. Initially this is
-   * rendered server-side.
-   */
-  this.placeholderBase = '';
-
-  /**
    * @var {jQuery} Placeholder DOM element as jQuery object.
    */
   this.$placeholder = null;
@@ -83,7 +74,8 @@ Drupal.media.WysiwygInstance = function(instanceInfo, placeholderBase) {
     this.token = instanceInfo;
   }
   if (placeholderBase) {
-    this.placeholderBase = placeholderBase;
+    this.$placeholder = $(placeholderBase);
+    this.syncSettingsToPlaceholder();
   }
 };
 
@@ -183,40 +175,6 @@ Drupal.media.WysiwygInstance.prototype = {
   },
 
   /**
-   * Set basic placeholder html template for this instance.
-   */
-  setPlaceholderBase: function(html) {
-    this.placeholderBase = html;
-  },
-
-  /**
-   * Get the basic wysiwyg placeholder template as html.
-   *
-   * This is the most basic version of the media placeholder in wysiwyg editors,
-   * and is rendered server-side in the first place.
-   *
-   * @return {string}
-   *   The wysiwyg placeholder template this instance should work with.
-   */
-  getPlaceholderBase: function() {
-    if (!this.placeholderBase) {
-      this.placeholderBase = Drupal.settings.media.tagMap[this.getKey()];
-      if (!this.placeholderBase) {
-        // The token is no longer the same as server-side, and the server-side
-        // rendered html template based on this token is no longer available.
-        // @todo: Feature parity with 3.x require map between fid and base html.
-        throw "Unable to retrieve media html.";
-      }
-      if ($('<div>').append(this.placeholderBase).text().length === this.placeholderBase.length) {
-        // Element is a #text node and needs to be wrapped in a HTML element so
-        // attributes can be attached.
-        this.placeholderBase = '<span>' + this.placeholderBase + '</span>';
-      }
-    }
-    return this.placeholderBase;
-  },
-
-  /**
    * Set the current placeholder for media instance.
    *
    * Calling this informs this instance that the given placeholder is the
@@ -228,7 +186,6 @@ Drupal.media.WysiwygInstance.prototype = {
    */
   setPlaceholder: function($placeholder) {
     this.$placeholder = $placeholder;
-    this.placeholderBase = Drupal.media.utils.outerHTML($placeholder);
     this.syncPlaceholderToSettings();
   },
 
@@ -238,12 +195,21 @@ Drupal.media.WysiwygInstance.prototype = {
    * @return {jQuery}
    */
   getPlaceholder: function() {
+    var placeholderBase;
+
     if (this.$placeholder) {
       return this.$placeholder;
     }
-    var placeholderBase = this.getPlaceholderBase();
-    if (!placeholderBase) {
-      throw "Invalid state: PlaceholderBase is missing";
+    if (!(placeholderBase = Drupal.settings.media.tagMap[this.getKey()])) {
+      // The token is no longer the same as server-side, and the server-side
+      // rendered html template based on this token is no longer available.
+      // @todo: Feature parity with 3.x require map between fid and base html.
+      throw "Unable to retrieve media html.";
+    }
+    if ($('<div>').append(placeholderBase).text().length === placeholderBase.length) {
+      // Element is a #text node and needs to be wrapped in a HTML element so
+      // attributes can be attached.
+      placeholderBase = '<span>' + placeholderBase + '</span>';
     }
     this.$placeholder = $(placeholderBase);
     this.syncSettingsToPlaceholder();
@@ -428,8 +394,6 @@ Drupal.media.WysiwygInstance.prototype = {
 
     // Extract the link text, if there is any.
     settings.link_text = (Drupal.settings.media.doLinkText) ? $placeholder.find('a:not(:has(img))').html() : false;
-    // Keep the base html for possible later placeholder rebuilds.
-    this.setPlaceholderBase(Drupal.media.utils.outerHTML($placeholder));
     // The placeholder and this.settings are now the correct 'owner' of this
     // instance, and the generated token and key, if any is outdated. These have
     // to be regenerated in order to get a new data-fid-key attribute in place.
