@@ -251,6 +251,20 @@ Drupal.media.WysiwygInstance.prototype = {
   },
 
   /**
+   * Reload placeholder according to settings.
+   *
+   * This resets the placeholder to a 'clean' state and builds it up again based
+   * on this instance's settings.
+   */
+  reloadPlaceholder() {
+    if (!this.getPlaceholder()) {
+      throw "Invalid state: Placeholder missing";
+    }
+    this.resetPlaceholderAttributes();
+    this.syncSettingsToPlaceholder();
+  },
+
+  /**
    * Remove generated attributes on wysiwyg placeholder.
    *
    * Some attributes and classes are generated and added to placeholder elements
@@ -258,17 +272,16 @@ Drupal.media.WysiwygInstance.prototype = {
    * This method resets the placeholder element so no attributes are
    * unnecessarily present.
    */
-  resetPlaceholderAttributes() {
+  resetPlaceholderAttributes: function() {
     if (!this.$placeholder) {
       throw "Invalid state: Instance placeholder is missing.";
     }
 
     // Remove any existing view mode classes, alignment classes and various data
     // attributes related to media management.
+    this.removePlaceholderAlignment();
     this.$placeholder.removeClass(function (index, css) {
       return (css.match(/\bfile-\S+/g) || []).join(' ');
-    }).removeClass(function (index, css) {
-      return (css.match(/\bmedia-wysiwyg-align-\S+/g) || []).join(' ');
     }).removeClass('media-element')
       .removeAttr('data-fid')
       .removeAttr('data-media-element')
@@ -276,9 +289,60 @@ Drupal.media.WysiwygInstance.prototype = {
   },
 
   /**
+   * Get current alignment for instance.
+   */
+  getAlignment: function() {
+    var settings = this.getSettings();
+    return settings.alignment;
+  },
+
+  /**
+   * Align instance.
+   *
+   * @param {string} value
+   *   The alignment value. Allowed values are 'left', 'center' or 'right'.
+   * @param {bool} toggle
+   *   Optional. Set this to true to toggle alignment on or off based on current
+   *   alignment.
+   *
+   * @return {bool}
+   *   true if alignment was set to given value, false otherwise.
+   */
+  setAlignment: function(value, toggle) {
+    var currentAlignment = this.getAlignment();
+    if (currentAlignment == value) {
+      if (toggle) {
+        this.removePlaceholderAlignment();
+        this.settings.alignment = '';
+        return false;
+      }
+      return true;
+    }
+    else {
+      if (currentAlignment) {
+        this.removePlaceholderAlignment();
+      }
+      this.$placeholder.addClass('media-wysiwyg-align-' + value);
+      this.settings.alignment = value;
+      this.token = this.key = '';
+      return true;
+    }
+  },
+
+  /**
+   * Remove any alignment methods from placeholder.
+   */
+  removePlaceholderAlignment: function() {
+    this.$placeholder.removeClass(function (index, css) {
+      return (css.match(/\bmedia-wysiwyg-align-\S+/g) || []).join(' ');
+    }).removeAttr('align')
+      .css('float', '');
+  },
+
+  /**
    * Sync state from settings to wysiwyg placeholder element.
    */
-  syncSettingsToPlaceholder() {
+  syncSettingsToPlaceholder: function() {
     var attributes, classes;
     var settings = this.getSettings();
     var self = this;
@@ -331,7 +395,7 @@ Drupal.media.WysiwygInstance.prototype = {
   /**
    * Sync state in wysiwyg placeholder element back to settings.
    */
-  syncPlaceholderToSettings() {
+  syncPlaceholderToSettings: function() {
     var value;
     var $placeholder = this.getPlaceholder();
     var settings = this.getSettings();
@@ -350,6 +414,7 @@ Drupal.media.WysiwygInstance.prototype = {
       }
     });
     this.syncAttributesToFields();
+    this.aggregateAlignmentFromAttributes();
 
     // Extract the link text, if there is any.
     settings.link_text = (Drupal.settings.media.doLinkText) ? $placeholder.find('a:not(:has(img))').html() : false;
@@ -360,6 +425,82 @@ Drupal.media.WysiwygInstance.prototype = {
     // to be regenerated in order to get a new data-fid-key attribute in place.
     this.token = '';
     this.key = '';
+  },
+
+  /**
+   * Aggregate various alignment methods to settings.alignment.
+   *
+   * Wysiwyg editors are free to set media alignment either with the 'align'
+   * attribute or inline css float, i.e. use other methods of alignment than the
+   * text justify buttons or media instance settings for alignment. The goal
+   * here is to aggregate the alignment the user actually *see* in the wysiwyg
+   * editor, so the aggregation follows the following priority of alignment:
+   *
+   *   1. inline css float.
+   *   2. 'media-wysiwyg-align-*' class
+   *   3. 'align' attribute.
+   *   4. settings.alignment.
+   */
+  aggregateAlignmentFromAttributes: function() {
+    var classes, rules;
+    var alignment = '';
+    var settings = this.getSettings();
+    var css = {};
+
+    // 3. alignment attribute
+    if (settings.attributes.align == 'left' || settings.attributes.align == 'right') {
+      settings.alignment = settings.attributes.align;
+      delete settings.attributes.align;
+    }
+
+    // 2. classes
+    if (settings.attributes.class) {
+      classes = settings.attributes.class.split (' ');
+      classes = classes.filter(function (className) {
+        var match = className.match(/^media-wysiwyg-align-(left|right|center)$/);
+        if (match) {
+          alignment = match[1];
+          return false;
+        }
+        return true;
+      });
+      if (alignment) {
+        settings.alignment = alignment;
+        if (classes) {
+          settings.attributes.class = classes.join(' ');
+        }
+        else {
+          delete settings.attributes.class;
+        }
+      }
+    }
+
+    // 1. inline style and float.
+    if (settings.attributes.style) {
+      rules = settings.attributes.style.split(';');
+      rules.forEach(function(rule) {
+        var i = rule.indexOf(':');
+        var property = rule.slice(0, i).trim();
+        var value = rule.slice(i + 1).trim();
+        if (property && value) {
+          css[property] = value;
+        }
+      });
+      if (css.float && (css.float == 'left' || css.float == 'right')) {
+        settings.alignment = css.float;
+        delete css.float;
+        rules = [];
+        $.each(css, function(property, value) {
+          rules.push(property + ':' + value);
+        });
+        if (rules.length) {
+          settings.attributes.style = rules.join(';');
+        }
+        else {
+          delete settings.attributes.style;
+        }
+      }
+    }
   },
 
   /**

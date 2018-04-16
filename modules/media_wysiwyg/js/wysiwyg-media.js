@@ -44,7 +44,7 @@ Drupal.wysiwyg.plugins.media = {
    *   The ID of the current editor instance.
    */
   invoke: function (data, settings, instanceId) {
-    var insert, mediaInstance;
+    var insert, mediaInstance, $placeholder;
     if (data.format == 'html') {
       insert = new InsertMedia(instanceId);
       // CKEDITOR module support doesn't set this setting
@@ -52,8 +52,12 @@ Drupal.wysiwyg.plugins.media = {
         settings['global'] = {id: 'media_wysiwyg'};
       }
       if (this.isNode(data.node)) {
-        // Change the view mode for already-inserted media.
-        mediaInstance = Drupal.media.filter.getMediaInstanceFromElement($(data.node));
+        // Edit existing media instance.
+        $placeholder = $(data.node);
+        mediaInstance = Drupal.media.filter.getMediaInstanceFromElement($placeholder);
+        // Feed media instance about current state in placeholder.
+        mediaInstance.setPlaceholder($placeholder);
+        Drupal.media.filter.addMediaInstance(mediaInstance);
         insert.onSelect([mediaInstance.getSettings()]);
       }
       else {

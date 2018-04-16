@@ -36,10 +36,13 @@
       for (var i = 0; i < matches.length; i++) {
         match = matches[i];
         try {
-          if (!(instance = this.getMediaInstanceFromToken(match))) {
-            instance = new Drupal.media.WysiwygInstance(match);
-            this.addMediaInstance(instance);
+          if ((instance = this.getMediaInstanceFromToken(match))) {
+            instance.reloadPlaceholder();
           }
+          else {
+            instance = new Drupal.media.WysiwygInstance(match);
+          }
+          this.addMediaInstance(instance);
           markup = instance.getPlaceholderHtml();
         }
         catch (err) {
@@ -76,11 +79,8 @@
         if (!mediaInstance) {
           return;
         }
-        // Inform the media instance about new/updated placeholder. Doing this
-        // will give it a new state, a different token and thereby a different
-        // key. So we add the instance again to still be able to track it. No
-        // need to delete previous entries: they are just references to the same
-        // object.
+        // Feed instance with current placeholder and make sure we still are
+        // able to track it before replacing it with the token.
         mediaInstance.setPlaceholder($placeholder);
         self.addMediaInstance(mediaInstance);
         $(this).replaceWith(mediaInstance.getToken());

@@ -40,16 +40,21 @@ CKEDITOR.plugins.add('mediaJustify', {
       // execution of the event once we're done.
       command.on('exec', function (e) {
         var mediaElements = getSelectedMediaElements(editor);
-        var $element;
-        var aligned;
-        var i;
+        var $element, mediaInstance, aligned, i;
         if (! mediaElements.length) {
           // Not our context. Leave untouched.
           return;
         }
         for (i = 0; i < mediaElements.length; i++) {
           $element = $(mediaElements[i].$);
-          aligned = Drupal.media.utils.alignMedia($element, align, true);
+          if (!(mediaInstance = Drupal.media.filter.getMediaInstanceFromElement($element))) {
+            // Element lost contact with or has no media instance object. Ripple
+            // alignment event down for others to handle.
+            return;
+          }
+          // Feed instance with current placeholder and set new alignment.
+          mediaInstance.setPlaceholder($element);
+          aligned = mediaInstance.setAlignment(align, true);
         }
         this.setState((mediaElements.length == 1 && aligned) ? CKEDITOR.TRISTATE_ON : CKEDITOR.TRISTATE_OFF);
         // Maybe a bug in CKEditor or not, but CKEDITOR.command.refresh() is not
@@ -68,13 +73,18 @@ CKEDITOR.plugins.add('mediaJustify', {
       // Ditto for the refresh handler.
       command.on('refresh', function (e) {
         var mediaElements = getSelectedMediaElements(editor);
-        var $element;
+        var $element, mediaInstance, currentAlignment;
         if (mediaElements.length != 1) {
           return;
         }
         $element = $(mediaElements[0].$);
-        var selectedAlign = Drupal.media.utils.getMediaAlignment($element);
-        this.setState(selectedAlign == align ? CKEDITOR.TRISTATE_ON : CKEDITOR.TRISTATE_OFF);
+        if (!(mediaInstance = Drupal.media.filter.getMediaInstanceFromElement($element))) {
+          return;
+        }
+        // Feed instance with current placeholder before accessing alignment.
+        mediaInstance.setPlaceholder($element);
+        currentAlignment = mediaInstance.getAlignment();
+        this.setState(currentAlignment == align ? CKEDITOR.TRISTATE_ON : CKEDITOR.TRISTATE_OFF);
         e.cancel();
       }, null, null, 5);
       return command;
