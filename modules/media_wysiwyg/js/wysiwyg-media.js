@@ -56,7 +56,7 @@ Drupal.wysiwyg.plugins.media = {
         $placeholder = $(data.node);
         mediaInstance = Drupal.media.filter.getMediaInstanceFromElement($placeholder);
         // Feed media instance about current state in placeholder.
-        mediaInstance.setPlaceholder($placeholder);
+        mediaInstance.setPlaceholderFromWysiwyg($placeholder);
         Drupal.media.filter.addMediaInstance(mediaInstance);
         insert.onSelect([mediaInstance.getSettings()]);
       }

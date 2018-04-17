@@ -53,7 +53,7 @@ CKEDITOR.plugins.add('mediaJustify', {
             return;
           }
           // Feed instance with current placeholder and set new alignment.
-          mediaInstance.setPlaceholder($element);
+          mediaInstance.setPlaceholderFromWysiwyg($element);
           aligned = mediaInstance.setAlignment(align, true);
         }
         this.setState((mediaElements.length == 1 && aligned) ? CKEDITOR.TRISTATE_ON : CKEDITOR.TRISTATE_OFF);
@@ -82,7 +82,7 @@ CKEDITOR.plugins.add('mediaJustify', {
           return;
         }
         // Feed instance with current placeholder before accessing alignment.
-        mediaInstance.setPlaceholder($element);
+        mediaInstance.setPlaceholderFromWysiwyg($element);
         currentAlignment = mediaInstance.getAlignment();
         this.setState(currentAlignment == align ? CKEDITOR.TRISTATE_ON : CKEDITOR.TRISTATE_OFF);
         e.cancel();

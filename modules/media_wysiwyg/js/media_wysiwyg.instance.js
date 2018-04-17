@@ -74,8 +74,7 @@ Drupal.media.WysiwygInstance = function(instanceInfo, placeholderBase) {
     this.token = instanceInfo;
   }
   if (placeholderBase) {
-    this.$placeholder = $(placeholderBase);
-    this.syncSettingsToPlaceholder();
+    this.setPlaceholderFromServer(placeholderBase);
   }
 };
 
@@ -175,7 +174,34 @@ Drupal.media.WysiwygInstance.prototype = {
   },
 
   /**
-   * Set the current placeholder for media instance.
+   * Prepare and set placeholder from server for wysiwyg.
+   *
+   * Placeholders given from rendered file entities comes in various form and
+   * formats. Prepare it by removing link wrappers, assert it has a valid tag
+   * and apply the instance settings on it, making it ready for inserting in
+   * wysiwyg environments.
+   *
+   * @param {string} placeholder
+   *   The placeholder coming from Drupal.
+   */
+  setPlaceholderFromServer: function(placeholder) {
+    if ($('<div>').append(placeholder).text().length === placeholder.length) {
+      // Element is a #text node and needs to be wrapped in a HTML element so
+      // attributes can be attached.
+      placeholder = '<span>' + placeholder + '</span>';
+    }
+    this.$placeholder = $(placeholder);
+    // Parse out link wrappers.
+    // @todo Fix link management for wysiwyg media.
+    // @see #2918848.
+    if (this.$placeholder.is('a') && this.$placeholder.find('img').length) {
+      this.$placeholder = this.$placeholder.children();
+    }
+    this.syncSettingsToPlaceholder();
+  },
+
+  /**
+   * Set the placeholder from Wysiwyg environment.
    *
    * Calling this informs this instance that the given placeholder is the
    * dominant source of media instance state. This will update the instance
@@ -184,7 +210,7 @@ Drupal.media.WysiwygInstance.prototype = {
    * @param {jQuery} $placeholder.
    *   The wysiwyg media placeholder.
    */
-  setPlaceholder: function($placeholder) {
+  setPlaceholderFromWysiwyg: function($placeholder) {
     this.$placeholder = $placeholder;
     this.syncPlaceholderToSettings();
   },
@@ -206,13 +232,7 @@ Drupal.media.WysiwygInstance.prototype = {
       // @todo: Feature parity with 3.x require map between fid and base html.
       throw "Unable to retrieve media html.";
     }
-    if ($('<div>').append(placeholderBase).text().length === placeholderBase.length) {
-      // Element is a #text node and needs to be wrapped in a HTML element so
-      // attributes can be attached.
-      placeholderBase = '<span>' + placeholderBase + '</span>';
-    }
-    this.$placeholder = $(placeholderBase);
-    this.syncSettingsToPlaceholder();
+    this.setPlaceholderFromServer(placeholderBase);
     return this.$placeholder;
   },
 
@@ -327,11 +347,6 @@ Drupal.media.WysiwygInstance.prototype = {
       throw "Invalid state: Instance placeholder is missing.";
     }
 
-    // Parse out link wrappers. They will be re-applied when the image is
-    // rendered on the front-end.
-    if (this.$placeholder.is('a') && this.$placeholder.find('img').length) {
-      this.$placeholder = this.$placeholder.children();
-    }
     this.syncFieldsToAttributes();
 
     // Move attributes from instance settings to the placeholder element.

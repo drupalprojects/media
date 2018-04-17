@@ -81,7 +81,7 @@
         }
         // Feed instance with current placeholder and make sure we still are
         // able to track it before replacing it with the token.
-        mediaInstance.setPlaceholder($placeholder);
+        mediaInstance.setPlaceholderFromWysiwyg($placeholder);
         self.addMediaInstance(mediaInstance);
         $(this).replaceWith(mediaInstance.getToken());
       });
