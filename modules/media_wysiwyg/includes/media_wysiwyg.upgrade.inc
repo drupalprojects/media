@@ -16,6 +16,7 @@ function media_wysiwyg_upgrade_content_tokens_batch(&$context) {
   $query = db_select('file_managed', 'fm');
   $query->innerJoin('file_usage', 'fu', 'fm.fid = fu.fid');
   $query->fields('fu', array('type', 'id'))
+    ->condition('fu.module', 'media')
     ->distinct();
   if (empty($context['results']['!entities_total'])) {
     // The countQuery() returns a cloned SelectQuery object, so we can happily
