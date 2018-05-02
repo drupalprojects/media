@@ -271,6 +271,12 @@ function media_wysiwyg_upgrade_entity_tokens($entity_type, $id) {
     'upgraded' => 0,
   );
 
+  // Assert that the entity type has a valid controller class to avoid getting
+  // php parse errors during token upgrades. See issue #2950150.
+  $type_info = entity_get_info($entity_type);
+  if (empty($type_info['controller class'])) {
+    return $report;
+  }
   if (!($entity = entity_load($entity_type, array($id)))) {
     return $report;
   };
@@ -368,7 +374,6 @@ function media_wysiwyg_upgrade_content_tokens_batch(&$context) {
   $query = db_select('file_managed', 'fm');
   $query->innerJoin('file_usage', 'fu', 'fm.fid = fu.fid');
   $query->fields('fu', array('type', 'id'))
-    ->condition('fu.module', 'media')
     ->distinct();
   if (empty($context['results']['!entities_total'])) {
     // The countQuery() returns a cloned SelectQuery object, so we can happily
